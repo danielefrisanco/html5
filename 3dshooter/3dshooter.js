@@ -157,8 +157,13 @@ ctx.fillText("OX"+offset.x+" OY"+offset.y+"", 60, h-60);
 		x=x-offset.x;
 		y=y-offset.y;
 		
+		
+	//	alert((distanza(w/2,h,x,y)));Math.round(h/(h/y))*
 		// calcolo le dimensioni in base alla prospettiva
-		pcw=Math.round(h/(h/(y)));
+		pcw=Math.round(h/(h/y));
+		pcw=Math.round((w/2)/Math.abs(x*cw-w/2))*Math.round(h/(h/y));
+		//FINIRE di sissteamre: devo usare x e y come centro aggiustaare ancora la formula della distanza
+		// 
 		if (!(x == -1 || x == w/cw || y == -1 || y == h/cw))
 		{
 			ctx.fillStyle = color1;
@@ -189,6 +194,12 @@ ctx.fillText("OX"+offset.x+" OY"+offset.y+"", 60, h-60);
 		 return {x: newx, y: newy};
 		
 		
+	}
+	
+	
+	function distanza(x1,y1,x2,y2)
+	{
+		return Math.sqrt((x1-x2)^2+(y1-y2)^2);
 	}
 
 	//Lets add the keyboard controls now
