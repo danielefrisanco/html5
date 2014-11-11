@@ -6,11 +6,13 @@ $(document).ready(function(){
 	var h = $("#canvas").height();
 	
 	//Lets save the cell width in a variable for easy control
-	var cw = 20;
+	var cw = 10 ;
 	var d;
 	var wall;
 	var score;
 	var offset;
+	var me;
+	var default_dist;
 	//Lets create the snake now
 	var enemy_array; //an array of cells to make up the snake
 	
@@ -25,8 +27,11 @@ $(document).ready(function(){
 		//Lets move the snake now using a timer which will trigger the paint function
 		//every 60ms
 		if(typeof game_loop != "undefined") clearInterval(game_loop);
-		game_loop = setInterval(paint, 600);
-		offset={x:0,y:0};
+		game_loop = setInterval(paint, 100);
+		offset={x:0,y:0,t:0};
+		me={x:(w-cw)/2,y:(h-cw)/2};// la mia posizione; forse non serve basta l'offset
+		// 
+		default_dist=distanza(me.x,me.y,0,0);
 	}
 	init();
 	
@@ -94,13 +99,13 @@ $(document).ready(function(){
 		//This will restart the game if the snake hits the wall
 		//Lets add the code for body collision
 		//Now if the head of the snake bumps into its body, the game will restart
-		if(nx == -1 || nx == w/cw || ny == -1 || ny == h/cw || check_collision(nx, ny, enemy_array)&& false)
+	/*	if(nx == -1 || nx == w/cw || ny == -1 || ny == h/cw || check_collision(nx, ny, enemy_array)&& false)
 		{
 			//restart game
 			init();
 			//Lets organize the code a bit now.
 			return;
-		}
+		}*/
 		
 		//Lets write the code to make the snake eat the wall
 		//The logic is simple
@@ -127,7 +132,9 @@ $(document).ready(function(){
 		{
 			var c = enemy_array[i];
 			//Lets paint 10px wide cells
+			 
 			paint_cell(c.x, c.y,"blue");
+		 
 		}
 		
 		//Lets paint the walls
@@ -136,7 +143,9 @@ $(document).ready(function(){
 		{
 			var c = wall_array[i];
 			//Lets paint 10px wide cells
+			 
 			paint_cell(c.x, c.y,"red");
+		 
 		}
 		
 		 
@@ -144,32 +153,52 @@ $(document).ready(function(){
 		var score_text = "Score: " + score;
 		ctx.fillText(score_text, 5, h-5);
 		
-		var rel_pos=relative_position(enemy_array[0].x,enemy_array[0].y,wall.x, wall.y,0);
-			ctx.fillText("X"+rel_pos.x+" Y"+rel_pos.y+"", 20, h-20);
-ctx.fillText("OX"+offset.x+" OY"+offset.y+"", 60, h-60);
- 
+		 
+         ctx.fillText("OX"+offset.x+" OY"+offset.y+" OT"+offset.t+"", 60, h-60);
+
 	}
-	
 	//Lets first create a generic function to paint cells
 	function paint_cell(x, y,color1)
 	{
 		
+		 
+		/*// avanti indietro destra sisnistra
 		x=x-offset.x;
 		y=y-offset.y;
+		*/
+		 radianti=offset.t/57.3;//converto i gradi in radianti
+		 
+		 //traslo da rispetto alla mia posizione a rispetto a (0,0)
+		x=x-(me.x+offset.x)/cw;
+		y=y-(me.y+offset.y)/cw;
 		
+		 var xx=Math.round((x*Math.cos(radianti)-y*Math.sin(radianti)) );
+		 y=Math.round((x*Math.sin(radianti)+y*Math.cos(radianti)) );
+		 
+		 //risistemo rispetto alla mia posizione
+		x=xx;
+	    x=x+(me.x+offset.x)/cw;
+		y=y+(me.y+offset.y)/cw;
 		
-	//	alert((distanza(w/2,h,x,y)));Math.round(h/(h/y))*
+		////alert((distanza(w/2,h,x,y)));
+//Math.round(h/(h/y))*
 		// calcolo le dimensioni in base alla prospettiva
-		pcw=Math.round(h/(h/y));
-		pcw=Math.round((w/2)/Math.abs(x*cw-w/2))*Math.round(h/(h/y));
-		//FINIRE di sissteamre: devo usare x e y come centro aggiustaare ancora la formula della distanza
-		// 
+		
+		
+		//trovo la dimensione del punto da disegnare PROPORZIOnale alla distanza da me
+		pcw=(1-distanza(me.x,me.y,x*cw,y*cw)/default_dist)*cw;
+		 // pcw=cw;
 		if (!(x == -1 || x == w/cw || y == -1 || y == h/cw))
 		{
+		 
+			hpcw=pcw/2;//half pcw , x e y sono il centro
 			ctx.fillStyle = color1;
-			ctx.fillRect(x*cw, y*cw, pcw, pcw);
+			ctx.fillRect(x*cw-hpcw, y*cw-hpcw, pcw, pcw);
 			ctx.strokeStyle = "white";
-			ctx.strokeRect(x*cw, y*cw, pcw, pcw);
+			ctx.strokeRect(x*cw-hpcw, y*cw-hpcw, pcw, pcw);
+			
+	//	 ctx.fillText("    X"+x*cw+"   Y"+y*cw+"   distanza"+distanza(0,0,x*cw-hpcw,y*cw-hpcw), x*cw, y*cw);
+
 		}
 	}
 	
@@ -199,7 +228,8 @@ ctx.fillText("OX"+offset.x+" OY"+offset.y+"", 60, h-60);
 	
 	function distanza(x1,y1,x2,y2)
 	{
-		return Math.sqrt((x1-x2)^2+(y1-y2)^2);
+		// distanza nel piano cartesianop
+		return Math.sqrt(Math.pow(x1-x2,2)+Math.pow(y1-y2,2));
 	}
 
 	//Lets add the keyboard controls now
@@ -213,10 +243,12 @@ ctx.fillText("OX"+offset.x+" OY"+offset.y+"", 60, h-60);
 		 
 
 
-		if(d == "right") { offset.x++;}
-		else if(d == "left") { offset.x--;}
-		else if(d == "up") {   offset.y--;}
-		else if(d == "down") { offset.y++;}
+		/*if(d == "right") { offset.x++;}
+		else if(d == "left") { offset.x--;}*/
+		if(d == "right") { offset.t+=6;}
+		else if(d == "left") { offset.t-=6;}
+		else if(d == "up") {   offset.y--;  }
+		else if(d == "down") { offset.y++; }
 
 
 		//The snake is now keyboard controllable
