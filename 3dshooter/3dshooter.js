@@ -16,12 +16,15 @@ $(document).ready(function(){
 	var default_dist;
 	//Lets create the snake now
 	var enemy_array; //an array of cells to make up the snake
-	
+	var keyPressed;
 	function init()
 	{
 		d = "right"; //default direction
 		create_enemy();
 		create_wall();  
+		//gestione tastiera
+		keyPressed=[];
+		 
 		//finally lets display the score
 		score = 0;
 		
@@ -81,21 +84,33 @@ $(document).ready(function(){
 		ctx.strokeStyle = "black";
 		ctx.strokeRect(0, 0, w, h);
 		
-		//The movement code for the snake to come here.
-		//The logic is simple
-		//Pop out the tail cell and place it infront of the head cell
-		var nx = enemy_array[0].x;
-		var ny = enemy_array[0].y;
-		//These were the position of the head cell.
-		//We will increment it to get the new head position
-		//Lets add proper direction based movement now
-		if(d == "right")  nx++; 
-		else if(d == "left")  nx--; 
-		else if(d == "up")  ny--; 
-		else if(d == "down")  ny++; 
 		 
-		 
+		  
+   if(keyPressed["39"]) { offset.t+=6;}
+	 if(keyPressed["37"]) { offset.t-=6;}
+	 if(keyPressed["38"]) {    //mi devo spostare in su rispetto all'area di gioco ma lo converto nel piano cartesiano
+										me.y=me.y- Math.cos(gradiToRadianti(360-offset.t));  
+										 me.x=me.x+Math.sin(gradiToRadianti(360-offset.t));   
+										 offset.y=center.y-me.y;
+										 offset.x=center.x-me.x;
+										  
+										}
+	 if(keyPressed["40"]) {  	   //mi devo spostare in giu rispetto all'area di gioco ma lo converto nel piano cartesiano
+											me.y=me.y+Math.cos(gradiToRadianti(360-offset.t));
+											 me.x=me.x-Math.sin(gradiToRadianti(360-offset.t));   
+												offset.y=center.y-me.y;
+												offset.x=center.x-me.x;
+												
+											}
 
+   
+   
+   
+   
+   
+   
+   
+   
 
 		//Lets add the game over clauses now
 		//This will restart the game if the snake hits the wall
@@ -245,6 +260,31 @@ $(document).ready(function(){
 		return gradi/57.3;
 	}
 
+	
+	/*TODO
+	-enemies must move
+	-manage collision
+	-shooting
+	-score(life ecc)
+	-respawn
+	-ammunition and new weapon
+	-sprites
+	 
+	-Usare il moUse???
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	*/
+	
+	
+	
+	/*
 	//Lets add the keyboard controls now
 	$(document).keydown(function(e){
 		var key = e.which;
@@ -256,33 +296,20 @@ $(document).ready(function(){
 		 
 
 
-		/*if(d == "right") { offset.x++;}
-		else if(d == "left") { offset.x--;}*/
-		if(d == "right") { offset.t+=6;}
-		else if(d == "left") { offset.t-=6;}
-		else if(d == "up") {    //mi devo spostare in su rispetto all'area di gioco ma lo converto nel piano cartesiano
-										me.y=me.y- Math.cos(gradiToRadianti(360-offset.t));  
-										 me.x=me.x+Math.sin(gradiToRadianti(360-offset.t));   
-										 offset.y=center.y-me.y;
-										 offset.x=center.x-me.x;
-										  
-										}
-		else if(d == "down") {  	   //mi devo spostare in giu rispetto all'area di gioco ma lo converto nel piano cartesiano
-											me.y=me.y+Math.cos(gradiToRadianti(360-offset.t));
-											 me.x=me.x-Math.sin(gradiToRadianti(360-offset.t));   
-												offset.y=center.y-me.y;
-												offset.x=center.x-me.x;
-												
-											}
+		//if(d == "right") { offset.x++;}
+		//else if(d == "left") { offset.x--;}
+		
 
-
-		//The snake is now keyboard controllable
+											
 	})
+	*/
 	
-	
-	
-	
-	
-	
+	document.addEventListener('keydown',
+											function(e) {  keyPressed[e.keyCode] = true;},
+											false);
+	document.addEventListener('keyup',
+											function(e) {   keyPressed[e.keyCode] = false;},
+											false);
+  
 	
 })
