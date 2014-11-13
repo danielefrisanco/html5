@@ -12,6 +12,7 @@ $(document).ready(function(){
 	var score;
 	var offset;
 	var me;
+	var center;
 	var default_dist;
 	//Lets create the snake now
 	var enemy_array; //an array of cells to make up the snake
@@ -29,7 +30,8 @@ $(document).ready(function(){
 		if(typeof game_loop != "undefined") clearInterval(game_loop);
 		game_loop = setInterval(paint, 100);
 		offset={x:0,y:0,t:0};
-		me={x:(w-cw)/2,y:(h-cw)/2};// la mia posizione; forse non serve basta l'offset
+		me={x:(w-cw)/2,y:(h-cw)/2};// la mia posizione
+		center={x:(w-cw)/2,y:(h-cw)/2};//centro
 		// 
 		default_dist=distanza(me.x,me.y,0,0);
 	}
@@ -146,16 +148,21 @@ $(document).ready(function(){
 			 
 			paint_cell(c.x, c.y,"red");
 		 
+		 
 		}
 		
-		 
+	//	paint me
+		 	 ctx.fillStyle ="black";
+			ctx.fillRect(me.x+offset.x -cw/2,me.y+offset.y -cw/2, cw, cw);
+			 
 		//Lets paint the score
 		var score_text = "Score: " + score;
 		ctx.fillText(score_text, 5, h-5);
 		
 		 
-         ctx.fillText("OX"+offset.x+" OY"+offset.y+" OT"+offset.t+"", 60, h-60);
+         ctx.fillText("OX"+offset.x+" OY"+offset.y+" OT"+offset.t+"   meX"+me.x+"   meY"+me.y, 60, h-60);
 
+		 
 	}
 	//Lets first create a generic function to paint cells
 	function paint_cell(x, y,color1)
@@ -166,40 +173,42 @@ $(document).ready(function(){
 		x=x-offset.x;
 		y=y-offset.y;
 		*/
-		 radianti=offset.t/57.3;//converto i gradi in radianti
-		 
+		 radianti=gradiToRadianti(offset.t);//converto i gradi in radianti
+	
 		 //traslo da rispetto alla mia posizione a rispetto a (0,0)
-		x=x-(me.x+offset.x)/cw;
-		y=y-(me.y+offset.y)/cw;
-		
-		 var xx=Math.round((x*Math.cos(radianti)-y*Math.sin(radianti)) );
-		 y=Math.round((x*Math.sin(radianti)+y*Math.cos(radianti)) );
-		 
+	 	x=x-((me.x)/cw );
+	 	y=y-((me.y )/cw) ;
+		//nel quadrato di gioco 0 gradi stanno al posto dei classici 90 gradi e la y cresce andando in giu 
+		 var xx=Math.round((x*Math.cos(radianti)-y*Math.sin(radianti))+offset.x/cw);
+		 y=Math.round((x*Math.sin(radianti)+y*Math.cos(radianti)) +offset.y/cw) ;
+	
 		 //risistemo rispetto alla mia posizione
 		x=xx;
-	    x=x+(me.x+offset.x)/cw;
-		y=y+(me.y+offset.y)/cw;
-		
+	     x=x+((me.x)/cw);
+	 	y=y+((me.y )/cw);
+	
 		////alert((distanza(w/2,h,x,y)));
 //Math.round(h/(h/y))*
 		// calcolo le dimensioni in base alla prospettiva
 		
 		
 		//trovo la dimensione del punto da disegnare PROPORZIOnale alla distanza da me
-		pcw=(1-distanza(me.x,me.y,x*cw,y*cw)/default_dist)*cw;
+		pcw=(1-distanza(center.x,center.y,x*cw,y*cw)/default_dist)*cw;
 		 // pcw=cw;
 		if (!(x == -1 || x == w/cw || y == -1 || y == h/cw))
 		{
 		 
 			hpcw=pcw/2;//half pcw , x e y sono il centro
 			ctx.fillStyle = color1;
-			ctx.fillRect(x*cw-hpcw, y*cw-hpcw, pcw, pcw);
+			ctx.fillRect(x*cw-hpcw,(y)*cw-hpcw, pcw, pcw);
 			ctx.strokeStyle = "white";
 			ctx.strokeRect(x*cw-hpcw, y*cw-hpcw, pcw, pcw);
 			
 	//	 ctx.fillText("    X"+x*cw+"   Y"+y*cw+"   distanza"+distanza(0,0,x*cw-hpcw,y*cw-hpcw), x*cw, y*cw);
 
 		}
+		
+		//ctx.fillText("   me.y"+me.y+"  me.x"+me.x   +"    offset.t"+ offset.t+"  cos"+Math.cos(gradiToRadianti(360-offset.t)) +"  sin"+Math.sin(gradiToRadianti(360-offset.t)) , 25, 25);
 	}
 	
 	function check_collision(x, y, array)
@@ -231,6 +240,10 @@ $(document).ready(function(){
 		// distanza nel piano cartesianop
 		return Math.sqrt(Math.pow(x1-x2,2)+Math.pow(y1-y2,2));
 	}
+	function gradiToRadianti(gradi)
+	{
+		return gradi/57.3;
+	}
 
 	//Lets add the keyboard controls now
 	$(document).keydown(function(e){
@@ -247,8 +260,20 @@ $(document).ready(function(){
 		else if(d == "left") { offset.x--;}*/
 		if(d == "right") { offset.t+=6;}
 		else if(d == "left") { offset.t-=6;}
-		else if(d == "up") {   offset.y--;  }
-		else if(d == "down") { offset.y++; }
+		else if(d == "up") {    //mi devo spostare in su rispetto all'area di gioco ma lo converto nel piano cartesiano
+										me.y=me.y- Math.cos(gradiToRadianti(360-offset.t));  
+										 me.x=me.x+Math.sin(gradiToRadianti(360-offset.t));   
+										 offset.y=center.y-me.y;
+										 offset.x=center.x-me.x;
+										  
+										}
+		else if(d == "down") {  	   //mi devo spostare in giu rispetto all'area di gioco ma lo converto nel piano cartesiano
+											me.y=me.y+Math.cos(gradiToRadianti(360-offset.t));
+											 me.x=me.x-Math.sin(gradiToRadianti(360-offset.t));   
+												offset.y=center.y-me.y;
+												offset.x=center.x-me.x;
+												
+											}
 
 
 		//The snake is now keyboard controllable
