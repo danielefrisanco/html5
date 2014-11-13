@@ -271,8 +271,8 @@ $(document).ready(function(){
 	-sprites
 	 
 	-Usare il moUse???
-	
-	
+	-meta scermo sopra deve avere la prospettiva rispetot a sopra e viceversa il sotto
+	- puo essere una specie di galaga o gtalondon e poi ne faccio un'altro che diventa wolfenstein 3d
 	
 	
 	
