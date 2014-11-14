@@ -86,8 +86,8 @@ $(document).ready(function(){
 		
 		 
 		  
-   if(keyPressed["39"]) { offset.t+=6;}
-	 if(keyPressed["37"]) { offset.t-=6;}
+   if(keyPressed["37"]) { offset.t =(offset.t+6)%360;}
+	 if(keyPressed["39"]) { offset.t=(offset.t-6)%360;}
 	 if(keyPressed["38"]) {    //mi devo spostare in su rispetto all'area di gioco ma lo converto nel piano cartesiano
 										me.y=me.y- Math.cos(gradiToRadianti(360-offset.t));  
 										 me.x=me.x+Math.sin(gradiToRadianti(360-offset.t));   
@@ -105,6 +105,8 @@ $(document).ready(function(){
 
    
    
+   if(keyPressed["32"]) {//space 
+								}
    
    
    
@@ -175,7 +177,8 @@ $(document).ready(function(){
 		ctx.fillText(score_text, 5, h-5);
 		
 		 
-         ctx.fillText("OX"+offset.x+" OY"+offset.y+" OT"+offset.t+"   meX"+me.x+"   meY"+me.y, 60, h-60);
+       //  ctx.fillText("OX"+offset.x+" OY"+offset.y+" OT"+offset.t+"   meX"+me.x+"   meY"+me.y, 60, h-60);
+         ctx.fillText("mex"+me.x+" mey"+me.y, 60, h-60);
 
 		 
 	}
@@ -194,8 +197,8 @@ $(document).ready(function(){
 	 	x=x-((me.x)/cw );
 	 	y=y-((me.y )/cw) ;
 		//nel quadrato di gioco 0 gradi stanno al posto dei classici 90 gradi e la y cresce andando in giu 
-		 var xx=Math.round((x*Math.cos(radianti)-y*Math.sin(radianti))+offset.x/cw);
-		 y=Math.round((x*Math.sin(radianti)+y*Math.cos(radianti)) +offset.y/cw) ;
+		 var xx=(x*Math.cos(radianti)-y*Math.sin(radianti))+offset.x/cw;
+		 y=(x*Math.sin(radianti)+y*Math.cos(radianti)) +offset.y/cw ;
 	
 		 //risistemo rispetto alla mia posizione
 		x=xx;
@@ -214,12 +217,13 @@ $(document).ready(function(){
 		{
 		 
 			hpcw=pcw/2;//half pcw , x e y sono il centro
+		 
 			ctx.fillStyle = color1;
 			ctx.fillRect(x*cw-hpcw,(y)*cw-hpcw, pcw, pcw);
 			ctx.strokeStyle = "white";
 			ctx.strokeRect(x*cw-hpcw, y*cw-hpcw, pcw, pcw);
 			
-	//	 ctx.fillText("    X"+x*cw+"   Y"+y*cw+"   distanza"+distanza(0,0,x*cw-hpcw,y*cw-hpcw), x*cw, y*cw);
+     ///	 ctx.fillText("    X"+x*cw+"   Y"+y*cw+"   offset.y/cw"+offset.y/cw+"y-((me.y )/cw)"+(y-((me.y )/cw))+" T"+offset.t, x*cw, y*cw);
 
 		}
 		
