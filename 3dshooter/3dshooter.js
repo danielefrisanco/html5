@@ -217,7 +217,7 @@ $(document).ready(function(){
 		{
 		 
 			hpcw=pcw/2;//half pcw , x e y sono il centro
-		 
+		  
 			ctx.fillStyle = color1;
 			ctx.fillRect(x*cw-hpcw,(y)*cw-hpcw, pcw, pcw);
 			ctx.strokeStyle = "white";
