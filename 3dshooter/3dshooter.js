@@ -5,6 +5,9 @@ $(document).ready(function(){
 	var w = $("#canvas").width();
 	var h = $("#canvas").height();
 	
+	
+	
+	
 	//Lets save the cell width in a variable for easy control
 	var cw = 10 ;
 	var d;
@@ -15,8 +18,15 @@ $(document).ready(function(){
 	var center;
 	var default_dist;
 	//Lets create the snake now
-	var enemy_array; //an array of cells to make up the snake
+	var enemy_array; //an array of cells
+	var bullet_array;// array dei colpi sparati
+	 var date ;//orario
 	var keyPressed;
+	var previous ;
+var lag ;
+var MS_PER_UPDATE;
+
+
 	function init()
 	{
 		d = "right"; //default direction
@@ -24,14 +34,19 @@ $(document).ready(function(){
 		create_wall();  
 		//gestione tastiera
 		keyPressed=[];
-		 
+		 //colpi
+		 bullet_array=[];
 		//finally lets display the score
 		score = 0;
-		
+		//date mi serve per l'orario
+		date = new Date();
+		previous = date.getTime();
+  lag = 0.0;
+  MS_PER_UPDATE=50;//aggiorno ogni 50 millisecondi la logica
 		//Lets move the snake now using a timer which will trigger the paint function
 		//every 60ms
 		if(typeof game_loop != "undefined") clearInterval(game_loop);
-		game_loop = setInterval(paint, 100);
+		game_loop = setInterval(paint, 1000/60);
 		offset={x:0,y:0,t:0};
 		me={x:(w-cw)/2,y:(h-cw)/2};// la mia posizione
 		center={x:(w-cw)/2,y:(h-cw)/2};//centro
@@ -39,7 +54,25 @@ $(document).ready(function(){
 		default_dist=distanza(me.x,me.y,0,0);
 	}
 	init();
+	/*
 	
+	DA USARE AL POStO del gameloop
+;(function () {
+  function main( tFrame ) {
+    MyGame.stopMain = window.requestAnimationFrame( main );
+    //tFrame è l'orario
+    update( tFrame ); //Call your update method. In our case, we give it rAF's timestamp.
+    render();
+  }
+  
+  
+  //INIT
+  main(performance.now()); // Start the cycle
+})();
+	
+	
+	
+	*/
 	function create_enemy()
 	{
 		var length = 5; // 
@@ -77,6 +110,12 @@ $(document).ready(function(){
 	//Lets paint the snake now
 	function paint()
 	{
+	
+	 var current = date.getTime();
+	 var elapsed = current - previous;
+     previous = current;
+    lag += elapsed;
+  
 		//To avoid the snake trail we need to paint the BG on every frame
 		//Lets paint the canvas now
 		ctx.fillStyle = "white";
@@ -85,7 +124,7 @@ $(document).ready(function(){
 		ctx.strokeRect(0, 0, w, h);
 		
 		 
-		  
+		  //processInput();
    if(keyPressed["37"]) { offset.t =(offset.t+6)%360;}
 	 if(keyPressed["39"]) { offset.t=(offset.t-6)%360;}
 	 if(keyPressed["38"]) {    //mi devo spostare in su rispetto all'area di gioco ma lo converto nel piano cartesiano
@@ -103,16 +142,29 @@ $(document).ready(function(){
 												
 											}
 
-   
+  
+  
    
    if(keyPressed["32"]) {//space 
+   bullet_array.push({x:me.x/cw,y:me.y/cw,t:offset.t,time:date.getTime()});
+   
+   //x e y devono essere diversi
 								}
    
    
+   /////////////FINE processInput();
    
    
-   
-   
+     while (lag >= MS_PER_UPDATE)
+  {
+  
+  // eseguo la logica indipendentemente dal rendering
+     update();
+     lag -= MS_PER_UPDATE;
+  }
+
+ 
+ 
 
 		//Lets add the game over clauses now
 		//This will restart the game if the snake hits the wall
@@ -126,27 +178,8 @@ $(document).ready(function(){
 			return;
 		}*/
 		
-		//Lets write the code to make the snake eat the wall
-		//The logic is simple
-		//If the new head position matches with that of the wall,
-		//Create a new head instead of moving the tail
-		/*if(nx == wall.x && ny == wall.y)
-		{
-			var tail = {x: nx, y: ny};
-			score++;
-			//Create new wall
-			create_wall();
-		}
-		else
-		{
-			var tail = enemy_array.pop(); //pops out the last cell
-			tail.x = nx; tail.y = ny;
-		}
-		*/
-		//The snake can now eat the wall.
 		
-		//enemy_array.unshift(tail); //puts back the tail as the first cell
-		
+	 ////////////// render();
 		for(var i = 0; i < enemy_array.length; i++)
 		{
 			var c = enemy_array[i];
@@ -167,6 +200,17 @@ $(document).ready(function(){
 		 
 		 
 		}
+		//Lets paint the bullets
+		
+		for(var i = 0; i < bullet_array.length; i++)
+		{
+			var c = bullet_array[i];
+			//Lets paint 10px wide cells
+			 
+			paint_cell(c.x, c.y,"green");
+		 
+		 
+		}
 		
 	//	paint me
 		 	 ctx.fillStyle ="black";
@@ -177,14 +221,16 @@ $(document).ready(function(){
 		ctx.fillText(score_text, 5, h-5);
 		
 		 
+		 /// ctx.fillText("  current"+current+"  previous"+previous   +"    lag"+lag+"  elapsed"+elapsed, 25, 25);
        //  ctx.fillText("OX"+offset.x+" OY"+offset.y+" OT"+offset.t+"   meX"+me.x+"   meY"+me.y, 60, h-60);
          ctx.fillText("mex"+me.x+" mey"+me.y, 60, h-60);
-
+/////////////fine  render();
 		 
 	}
 	//Lets first create a generic function to paint cells
 	function paint_cell(x, y,color1)
 	{
+		
 		
 		 
 		/*// avanti indietro destra sisnistra
@@ -223,7 +269,7 @@ $(document).ready(function(){
 			ctx.strokeStyle = "white";
 			ctx.strokeRect(x*cw-hpcw, y*cw-hpcw, pcw, pcw);
 			
-     ///	 ctx.fillText("    X"+x*cw+"   Y"+y*cw+"   offset.y/cw"+offset.y/cw+"y-((me.y )/cw)"+(y-((me.y )/cw))+" T"+offset.t, x*cw, y*cw);
+     //	 ctx.fillText("    X"+x*cw+"   Y"+y*cw+"   offset.y/cw"+offset.y/cw+"y-((me.y )/cw)"+(y-((me.y )/cw))+" T"+offset.t, x*cw, y*cw);
 
 		}
 		
@@ -243,6 +289,13 @@ $(document).ready(function(){
 	}
 	
 	
+	function update( )
+	{
+		 //aggiorna tutto(movimenti dei nemici collisioni proiettili ecc
+		  check_collision(0, 0, bullet_array);
+		 
+
+	}
 	function relative_position(myx,myy,x,y,direction)
 	{
 		direction=0;//angolo
@@ -272,8 +325,8 @@ $(document).ready(function(){
 	-score(life ecc)
 	-respawn
 	-ammunition and new weapon
-	-sprites
-	 
+	-sprites//new Image
+	 -rifare il gameloop (requestAnimationFrame)
 	-Usare il moUse???
 	-meta scermo sopra deve avere la prospettiva rispetot a sopra e viceversa il sotto
 	- puo essere una specie di galaga o gtalondon e poi ne faccio un'altro che diventa wolfenstein 3d
