@@ -115,6 +115,7 @@ var MS_PER_UPDATE;
 	{
 	 
 		////// {x:me.x/cw,y:me.y/cw,t:offset.t,time:date.getTime()} 
+		// new Bullet
 		var bullet= {x:xpos,y:ypos,t:angle,time:currentTime,alive:true} ;
 		return bullet;
 		
@@ -124,6 +125,167 @@ var MS_PER_UPDATE;
 		//This will create a cell with x/y between 0-44
 		//Because there are 45(450/10) positions accross the rows and columns
 	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	/*
+	
+	vedere se QUESTO MODO DI FARE I PROIETTI LI MI PUO ESSERE UTILE(specialmente le funzioni draw e update direttamente sul bullet)
+	 function Bullet(source, dir)
+    {
+        this.id = "bullet";
+        this.width = 10;
+        this.height = 3;
+        this.dir = dir;
+
+        if (this.dir == 1)
+        {
+            this.x = source.x + source.width - 5;
+            this.y = source.y + 16;
+        }
+        if (this.dir == -1)
+        {
+            this.x = source.x;
+            this.y = source.y + 16;
+        }
+    }
+    Bullet.prototype.update = function()
+    {
+        if (this.dir == 1) this.x += 8;
+        if (this.dir == -1) this.x -= 8;
+
+        for (var i in game.enemies)
+        {
+            checkCollisions(this, game.enemies[i]);
+        }
+        // Check if bullet leaves the viewport
+        if (this.x < game.viewX * 32 || this.x > (game.viewX + game.tilesX) * 32)
+        {
+            removeFromList(game.bullets, this);
+        }
+    }
+    Bullet.prototype.draw = function()
+    {
+        // bullet flipping uses orientation of the player
+        var posX = game.player.scale == 1 ? this.x : (this.x + this.width) * -1;
+        game.ctx.scale(game.player.scale, 1); 
+        game.ctx.drawImage(gameData.getGfx("bullet"), posX, this.y);
+    }
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	*/
+	
+	
+	
+	//per poter usare questo Bullet CLASSE 
+	//bisogna che quando creo il bullet faccio update bullet
+	//create_bullet(xpos,ypos,angle,currentTime)
+	function Bullet(xpos,ypos,angle,currentTime){
+	this.x=xpos;
+	this.y=ypos;
+	this.t=angle;
+	this.time=currentTime;
+	this.alive=true;
+	}
+	
+	
+	
+	
+    Bullet.prototype.update = function()
+    {
+     //  update_bullet(this);
+	   
+	     var adesso=Date.now();
+		 var timeDiff=adesso-this.time+1;
+		 if (timeDiff<1000 && this.alive==true)
+		 {
+			 this.x=this.x-Math.sin(gradiToRadianti(this.t))*timeDiff/1000*bullet_speed;
+			 this.y=this.y-Math.cos(gradiToRadianti(this.t))*timeDiff/1000*bullet_speed; 
+		 }
+		 else {this.alive=false;}
+    }
+	
+	
+    Bullet.prototype.draw = function()
+    {
+     //disegno il proiettile
+    }
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	/*non serve piu visto che uso la clase Bullet
+	
 	function update_bullet(bullet)
 	{ 
 		  var adesso=Date.now();
@@ -135,7 +297,7 @@ var MS_PER_UPDATE;
 		 }
 		 else {bullet.alive=false;}
 		 return bullet;
-	}
+	}*/
 	//Lets paint the snake now
 	function paint()
 	{
@@ -176,7 +338,8 @@ var MS_PER_UPDATE;
    
    if(keyPressed["32"]) {//space 
    //  bullet_array.push({x:me.x/cw,y:me.y/cw,t:offset.t,time:date.getTime()});
- bullet_array.push(create_bullet(me.x/cw,me.y/cw,offset.t,current));
+    //bullet_array.push(create_bullet(me.x/cw,me.y/cw,offset.t,current));
+ bullet_array.push(new Bullet(me.x/cw,me.y/cw,offset.t,current));
 
    //x e y devono essere diversi
 								}
@@ -329,7 +492,8 @@ var MS_PER_UPDATE;
 			var c = bullet_array[i];
 			//Lets update bullet position
 			 
-			 c=update_bullet(c);
+			// c=update_bullet(c);
+			 c.update();
 			 if (c.alive==false)
 			 {bullet_array.splice(i,1);//elimino il proiettile
 			 }
