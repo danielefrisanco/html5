@@ -20,6 +20,8 @@ $(document).ready(function(){
 	//Lets create the snake now
 	var enemy_array; //an array of cells
 	var bullet_array;// array dei colpi sparati
+	var bullet_speed;
+	
 	 var date ;//orario
 	var keyPressed;
 	var previous ;
@@ -36,11 +38,12 @@ var MS_PER_UPDATE;
 		keyPressed=[];
 		 //colpi
 		 bullet_array=[];
+		 bullet_speed=30;//pixel/second
 		//finally lets display the score
 		score = 0;
 		//date mi serve per l'orario
 		date = new Date();
-		previous = date.getTime();
+		previous = Date.now();
   lag = 0.0;
   MS_PER_UPDATE=50;//aggiorno ogni 50 millisecondi la logica
 		//Lets move the snake now using a timer which will trigger the paint function
@@ -107,11 +110,37 @@ var MS_PER_UPDATE;
 		//Because there are 45(450/10) positions accross the rows and columns
 	}
 	
+	
+	function create_bullet(xpos,ypos,angle,currentTime)
+	{
+	 
+		////// {x:me.x/cw,y:me.y/cw,t:offset.t,time:date.getTime()} 
+		var bullet= {x:xpos,y:ypos,t:angle,time:currentTime,alive:true} ;
+		return bullet;
+		
+		
+		
+		
+		//This will create a cell with x/y between 0-44
+		//Because there are 45(450/10) positions accross the rows and columns
+	}
+	function update_bullet(bullet)
+	{ 
+		  var adesso=Date.now();
+		 var timeDiff=adesso-bullet.time+1;
+		 if (timeDiff<1000 && bullet.alive==true)
+		 {
+			 bullet.x=bullet.x-Math.sin(gradiToRadianti(bullet.t))*timeDiff/1000*bullet_speed;
+			 bullet.y=bullet.y-Math.cos(gradiToRadianti(bullet.t))*timeDiff/1000*bullet_speed; 
+		 }
+		 else {bullet.alive=false;}
+		 return bullet;
+	}
 	//Lets paint the snake now
 	function paint()
 	{
 	
-	 var current = date.getTime();
+	 var current = Date.now();
 	 var elapsed = current - previous;
      previous = current;
     lag += elapsed;
@@ -146,15 +175,16 @@ var MS_PER_UPDATE;
   
    
    if(keyPressed["32"]) {//space 
-   bullet_array.push({x:me.x/cw,y:me.y/cw,t:offset.t,time:date.getTime()});
-   
+   //  bullet_array.push({x:me.x/cw,y:me.y/cw,t:offset.t,time:date.getTime()});
+ bullet_array.push(create_bullet(me.x/cw,me.y/cw,offset.t,current));
+
    //x e y devono essere diversi
 								}
    
    
    /////////////FINE processInput();
    
-   
+    
      while (lag >= MS_PER_UPDATE)
   {
   
@@ -276,7 +306,7 @@ var MS_PER_UPDATE;
 		//ctx.fillText("   me.y"+me.y+"  me.x"+me.x   +"    offset.t"+ offset.t+"  cos"+Math.cos(gradiToRadianti(360-offset.t)) +"  sin"+Math.sin(gradiToRadianti(360-offset.t)) , 25, 25);
 	}
 	
-	function check_collision(x, y, array)
+	function check_collision(x, y, array)//QUESTA FUNZIONE VA AGGIUNTO IL TEMPO e bisogna guardare che 2 array alla volta non si tocchino
 	{
 		//This function will check if the provided x/y coordinates exist
 		//in an array of cells or not
@@ -292,8 +322,21 @@ var MS_PER_UPDATE;
 	function update( )
 	{
 		 //aggiorna tutto(movimenti dei nemici collisioni proiettili ecc
-		  check_collision(0, 0, bullet_array);
+		//  check_collision(0, 0, bullet_array);
+		//    alert("nex");
+		for(var i = 0; i < bullet_array.length; i++)
+		{
+			var c = bullet_array[i];
+			//Lets update bullet position
+			 
+			 c=update_bullet(c);
+			 if (c.alive==false)
+			 {bullet_array.splice(i,1);//elimino il proiettile
+			 }
+			else{bullet_array[i]=c;}
 		 
+		}
+		
 
 	}
 	function relative_position(myx,myy,x,y,direction)
