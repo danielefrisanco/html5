@@ -83,7 +83,8 @@ var MS_PER_UPDATE;
 		for(var i = length-1; i>=0; i--)
 		{
 			//This will create a enemies
-			enemy_array.push({x: Math.round(Math.random()*(w-cw)/cw), y: Math.round(Math.random()*(h-cw)/cw)});
+			//enemy_array.push({x: Math.round(Math.random()*(w-cw)/cw), y: Math.round(Math.random()*(h-cw)/cw)});
+			enemy_array.push({x: Math.round(Math.random()*(w-cw)), y: Math.round(Math.random()*(h-cw))});
 		}
 	}
 	
@@ -99,7 +100,8 @@ var MS_PER_UPDATE;
 		for(var i = length-1; i>=0; i--)
 		{
 			 
-			wall_array.push({x: Math.round(Math.random()*(w-cw)/cw), y: Math.round(Math.random()*(h-cw)/cw)});
+			//wall_array.push({x: Math.round(Math.random()*(w-cw)/cw), y: Math.round(Math.random()*(h-cw)/cw)});
+			wall_array.push({x: Math.round(Math.random()*(w-cw)), y: Math.round(Math.random()*(h-cw))});
 		}
 		
 		
@@ -339,7 +341,7 @@ var MS_PER_UPDATE;
    if(keyPressed["32"]) {//space 
    //  bullet_array.push({x:me.x/cw,y:me.y/cw,t:offset.t,time:date.getTime()});
     //bullet_array.push(create_bullet(me.x/cw,me.y/cw,offset.t,current));
- bullet_array.push(new Bullet(me.x/cw,me.y/cw,offset.t,current));
+ bullet_array.push(new Bullet(me.x,me.y,offset.t,current));
 
    //x e y devono essere diversi
 								}
@@ -433,16 +435,16 @@ var MS_PER_UPDATE;
 		 radianti=gradiToRadianti(offset.t);//converto i gradi in radianti
 	
 		 //traslo da rispetto alla mia posizione a rispetto a (0,0)
-	 	x=x-((me.x)/cw );
-	 	y=y-((me.y )/cw) ;
+	 	x=x-((me.x) );
+	 	y=y-((me.y )) ;
 		//nel quadrato di gioco 0 gradi stanno al posto dei classici 90 gradi e la y cresce andando in giu 
-		 var xx=(x*Math.cos(radianti)-y*Math.sin(radianti))+offset.x/cw;
-		 y=(x*Math.sin(radianti)+y*Math.cos(radianti)) +offset.y/cw ;
+		 var xx=(x*Math.cos(radianti)-y*Math.sin(radianti))+offset.x;
+		 y=(x*Math.sin(radianti)+y*Math.cos(radianti)) +offset.y ;
 	
 		 //risistemo rispetto alla mia posizione
 		x=xx;
-	     x=x+((me.x)/cw);
-	 	y=y+((me.y )/cw);
+	     x=x+((me.x));
+	 	y=y+((me.y ));
 	
 		////alert((distanza(w/2,h,x,y)));
 //Math.round(h/(h/y))*
@@ -450,17 +452,17 @@ var MS_PER_UPDATE;
 		
 		
 		//trovo la dimensione del punto da disegnare PROPORZIOnale alla distanza da me
-		pcw=(1-distanza(center.x,center.y,x*cw,y*cw)/default_dist)*cw;
-		 // pcw=cw;
-		if (!(x == -1 || x == w/cw || y == -1 || y == h/cw))
+		pcw=(1-distanza(center.x,center.y,x,y)/default_dist)*cw;
+		// pcw=cw;
+		if (!(x == -1 || x == w || y == -1 || y == h))
 		{
 		 
 			hpcw=pcw/2;//half pcw , x e y sono il centro
 		  
 			ctx.fillStyle = color1;
-			ctx.fillRect(x*cw-hpcw,(y)*cw-hpcw, pcw, pcw);
+			ctx.fillRect(x-hpcw,(y)-hpcw, pcw, pcw);
 			ctx.strokeStyle = "white";
-			ctx.strokeRect(x*cw-hpcw, y*cw-hpcw, pcw, pcw);
+			ctx.strokeRect(x-hpcw, y-hpcw, pcw, pcw);
 			
      //	 ctx.fillText("    X"+x*cw+"   Y"+y*cw+"   offset.y/cw"+offset.y/cw+"y-((me.y )/cw)"+(y-((me.y )/cw))+" T"+offset.t, x*cw, y*cw);
 
