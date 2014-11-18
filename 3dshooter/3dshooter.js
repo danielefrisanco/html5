@@ -21,6 +21,7 @@ $(document).ready(function(){
 	var enemy_array; //an array of cells
 	var bullet_array;// array dei colpi sparati
 	var bullet_speed;
+	var enemy_speed;
 	
 	 var date ;//orario
 	var keyPressed;
@@ -32,13 +33,13 @@ var MS_PER_UPDATE;
 	function init()
 	{
 		d = "right"; //default direction
-		create_enemy();
-		create_wall();  
+	
 		//gestione tastiera
 		keyPressed=[];
 		 //colpi
 		 bullet_array=[];
-		 bullet_speed=30;//pixel/second
+		 bullet_speed=50;//pixel/second
+		 enemy_speed=9 ;
 		//finally lets display the score
 		score = 0;
 		//date mi serve per l'orario
@@ -47,7 +48,12 @@ var MS_PER_UPDATE;
   lag = 0.0;
   MS_PER_UPDATE=50;//aggiorno ogni 50 millisecondi la logica
 		//Lets move the snake now using a timer which will trigger the paint function
-		//every 60ms
+		//every 60ms	
+		
+		
+		
+		create_enemy();
+		create_wall();  
 		if(typeof game_loop != "undefined") clearInterval(game_loop);
 		game_loop = setInterval(paint, 1000/60);
 		offset={x:0,y:0,t:0};
@@ -84,7 +90,8 @@ var MS_PER_UPDATE;
 		{
 			//This will create a enemies
 			//enemy_array.push({x: Math.round(Math.random()*(w-cw)/cw), y: Math.round(Math.random()*(h-cw)/cw)});
-			enemy_array.push({x: Math.round(Math.random()*(w-cw)), y: Math.round(Math.random()*(h-cw))});
+		//	enemy_array.push({x: Math.round(Math.random()*(w-cw)), y: Math.round(Math.random()*(h-cw))});
+			enemy_array.push(new Enemy( Math.round(Math.random()*(w-cw)), Math.round(Math.random()*(h-cw)),Math.random()*360,Date.now()));
 		}
 	}
 	
@@ -247,12 +254,13 @@ var MS_PER_UPDATE;
 	//per poter usare questo Bullet CLASSE 
 	//bisogna che quando creo il bullet faccio update bullet
 	//create_bullet(xpos,ypos,angle,currentTime)
-	function Bullet(xpos,ypos,angle,currentTime){
+	function Bullet(xpos,ypos,direction,currentTime){
 	this.x=xpos;
 	this.y=ypos;
-	this.t=angle;
+	this.t=direction;
 	this.time=currentTime;
 	this.alive=true;
+	this.speed=bullet_speed;
 	}
 	
 	
@@ -266,8 +274,8 @@ var MS_PER_UPDATE;
 		 var timeDiff=adesso-this.time+1;
 		 if (timeDiff<1000 && this.alive==true)
 		 {
-			 this.x=this.x-Math.sin(gradiToRadianti(this.t))*timeDiff/1000*bullet_speed;
-			 this.y=this.y-Math.cos(gradiToRadianti(this.t))*timeDiff/1000*bullet_speed; 
+			 this.x=this.x-Math.sin(gradiToRadianti(this.t))*timeDiff/1000*this.speed;
+			 this.y=this.y-Math.cos(gradiToRadianti(this.t))*timeDiff/1000*this.speed; 
 		 }
 		 else {this.alive=false;}
     }
@@ -276,6 +284,42 @@ var MS_PER_UPDATE;
     Bullet.prototype.draw = function()
     {
      //disegno il proiettile
+    }
+	
+	
+	
+	function Enemy(xpos,ypos,direction,currentTime){
+	this.x=xpos;
+	this.y=ypos;
+	this.t=direction;
+	this.time=currentTime;
+	this.alive=true;
+	this.speed=enemy_speed; 
+	}
+	
+	
+	
+	
+    Enemy.prototype.update = function()
+    { 
+		this.t=rnd(this.t,15);
+	     var adesso=Date.now();
+		 var timeDiff=adesso-this.time+1;
+		 this.time=adesso;
+		 if (  this.alive==true)
+		 {
+		  
+		 this.x=this.x-Math.sin(gradiToRadianti(this.t))*timeDiff/1000*	this.speed;
+			 this.y=this.y 	-Math.cos(gradiToRadianti(this.t))*timeDiff/1000*	this.speed ;  
+		 }
+		 else {this.alive=false;}
+		 
+    }
+	
+	
+    Enemy.prototype.draw = function()
+    {
+     //disegno il Enemy
     }
 	
 	
@@ -502,6 +546,19 @@ var MS_PER_UPDATE;
 			else{bullet_array[i]=c;}
 		 
 		}
+			for(var i = 0; i < enemy_array.length; i++)
+		{
+			var c = enemy_array[i];
+			//Lets update bullet position
+			 
+			// c=update_bullet(c);
+			 c.update();
+			 if (c.alive==false)
+			 {enemy_array.splice(i,1);//elimino il proiettile
+			 }
+			else{enemy_array[i]=c;}
+		 
+		}
 		
 
 	}
@@ -525,8 +582,12 @@ var MS_PER_UPDATE;
 	{
 		return gradi/57.3;
 	}
-
-	
+function rnd_snd() {
+    return (Math.random()*2-1)+(Math.random()*2-1)+(Math.random()*2-1);
+}
+	function rnd(mean, stdev) {
+    return Math.round(rnd_snd()*stdev+mean);
+}
 	/*TODO
 	-enemies must move
 	-manage collision
