@@ -300,9 +300,12 @@ var MS_PER_UPDATE;
 	
 	
 	
-    Enemy.prototype.update = function()
+    Enemy.prototype.update = function(x_target,y_target)
     { 
-		this.t=rnd(this.t,15);
+	
+	
+	var rd=relative_direction(this.x,this.y,x_target,y_target);
+		this.t=   rnd(rd,40) ;
 	     var adesso=Date.now();
 		 var timeDiff=adesso-this.time+1;
 		 this.time=adesso;
@@ -386,7 +389,7 @@ var MS_PER_UPDATE;
    //  bullet_array.push({x:me.x/cw,y:me.y/cw,t:offset.t,time:date.getTime()});
     //bullet_array.push(create_bullet(me.x/cw,me.y/cw,offset.t,current));
  bullet_array.push(new Bullet(me.x,me.y,offset.t,current));
-
+ 
    //x e y devono essere diversi
 								}
    
@@ -551,8 +554,8 @@ var MS_PER_UPDATE;
 			var c = enemy_array[i];
 			//Lets update bullet position
 			 
-			// c=update_bullet(c);
-			 c.update();
+			 
+			 c.update(me.x,me.y);
 			 if (c.alive==false)
 			 {enemy_array.splice(i,1);//elimino il proiettile
 			 }
@@ -572,6 +575,14 @@ var MS_PER_UPDATE;
 		
 	}
 	
+	 function relative_direction(myx,myy,x,y)
+	 {// calcolo la direzione che devo prendere per andare verso un certo punto
+		dy = myy -  y;
+		dx = myx -  x;
+		theta = Math.atan2(dy, dx);
+		theta *= 180/Math.PI // rads to degs
+		return -270-theta; 
+	 }
 	
 	function distanza(x1,y1,x2,y2)
 	{
@@ -587,6 +598,7 @@ function rnd_snd() {
 }
 	function rnd(mean, stdev) {
     return Math.round(rnd_snd()*stdev+mean);
+	// per una distribuzione normale provare anche ((Math.random() + Math.random() + Math.random() + Math.random() + Math.random() + Math.random()) - 3) / 3
 }
 	/*TODO
 	-enemies must move
