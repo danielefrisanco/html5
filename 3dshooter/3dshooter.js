@@ -26,8 +26,8 @@ $(document).ready(function(){
 	 var date ;//orario
 	var keyPressed;
 	var previous ;
-var lag ;
-var MS_PER_UPDATE;
+	var lag ;
+	var MS_PER_UPDATE;
 
 
 	function init()
@@ -58,7 +58,7 @@ var MS_PER_UPDATE;
 		offset={x:0,y:0,t:0};
 		me=new Me( (w-cw)/2, (h-cw)/2,0 ,performance.now());
 		
-	///////	me={x:(w-cw)/2,y:(h-cw)/2};// la mia posizione
+		///////	me={x:(w-cw)/2,y:(h-cw)/2};// la mia posizione
 		center={x:(w-cw)/2,y:(h-cw)/2};//centro
 		// 
 		default_dist=distanza(me.x,me.y,0,0);
@@ -67,21 +67,21 @@ var MS_PER_UPDATE;
 	/*
 	
 	DA USARE AL POStO del gameloop
-;(function () {
-  function main( tFrame ) {
+	;(function () {
+	function main( tFrame ) {
     MyGame.stopMain = window.requestAnimationFrame( main );
     //tFrame è l'orario
     update( tFrame ); //Call your update method. In our case, we give it rAF's timestamp.
     render();
-  }
+	}
   
   
-  //INIT
-  main(performance.now()); // Start the cycle
-})();
-	
-	
-	
+	//INIT
+	main(performance.now()); // Start the cycle
+	})();
+
+
+
 	*/
 	function create_enemy()
 	{
@@ -91,7 +91,7 @@ var MS_PER_UPDATE;
 		{
 			//This will create a enemies
 			//enemy_array.push({x: Math.round(Math.random()*(w-cw)/cw), y: Math.round(Math.random()*(h-cw)/cw)});
-		//	enemy_array.push({x: Math.round(Math.random()*(w-cw)), y: Math.round(Math.random()*(h-cw))});
+			//	enemy_array.push({x: Math.round(Math.random()*(w-cw)), y: Math.round(Math.random()*(h-cw))});
 			enemy_array.push(new Enemy( Math.round(Math.random()*(w-cw)), Math.round(Math.random()*(h-cw)),Math.random()*360,performance.now()));
 		}
 	}
@@ -109,7 +109,7 @@ var MS_PER_UPDATE;
 		{
 			 
 			//wall_array.push({x: Math.round(Math.random()*(w-cw)/cw), y: Math.round(Math.random()*(h-cw)/cw)});
-			wall_array.push({x: Math.round(Math.random()*(w-cw)), y: Math.round(Math.random()*(h-cw))});
+			wall_array.push({x: Math.round(Math.random()*(w-cw)), y: Math.round(Math.random()*(h-cw))});// FARE I MURI come matrice o disegnarli come righe memorizzandoli a coppie di punti
 		}
 		
 		
@@ -121,14 +121,6 @@ var MS_PER_UPDATE;
 	}
 	
 	 
-	
-	
-	
-	
-	 
-	
-	
-	
 	
 	
 	
@@ -180,15 +172,7 @@ var MS_PER_UPDATE;
     }
 	
 	
-	
 	 
-	
-	
-	
-	
-	
-	
-	
 	
 
 	
@@ -218,20 +202,22 @@ var MS_PER_UPDATE;
     {
      //  update_bullet(this);
 	   
-	     var adesso=performance.now();
-		 var timeDiff=adesso-this.time+1;
-		 if (timeDiff<1000 && this.alive==true)
-		 {
-			 this.x=this.x-Math.sin(gradiToRadianti(this.t))*timeDiff/1000*this.speed;
-			 this.y=this.y-Math.cos(gradiToRadianti(this.t))*timeDiff/1000*this.speed; 
-		 }
-		 else {this.alive=false;}
-    }
+		var adesso=performance.now();
+		var timeDiff=adesso-this.time+1;
+		if (timeDiff<1000 && this.alive==true)
+		{
+			this.x=this.x-Math.sin(gradiToRadianti(this.t))*timeDiff/1000*this.speed;
+			this.y=this.y-Math.cos(gradiToRadianti(this.t))*timeDiff/1000*this.speed; 
+		}
+		else {
+			this.alive=false;
+			}
+	}
 	
 	
     Bullet.prototype.draw = function()
     {
-     //disegno il proiettile
+		//disegno il proiettile
     }
 	
 	
@@ -251,8 +237,7 @@ var MS_PER_UPDATE;
 	
     Enemy.prototype.update = function(x_target,y_target)
     { 
-	
-	
+	 
 		var rd=relative_direction(this.x,this.y,x_target,y_target);
 		this.t=   rnd(rd,40) ;
 		var adesso=performance.now();
@@ -260,7 +245,6 @@ var MS_PER_UPDATE;
 		this.time=adesso;
 		if (  this.alive==true)
 		{
-
 			this.x=this.x-Math.sin(gradiToRadianti(this.t))*timeDiff/1000*	this.speed;
 			this.y=this.y 	-Math.cos(gradiToRadianti(this.t))*timeDiff/1000*	this.speed ;  
 		}
@@ -294,12 +278,10 @@ var MS_PER_UPDATE;
 	
 	
 	
-	
     Me.prototype.update = function(x_target,y_target)
     { 
 	
 	
-		
 		
 		 
     }
@@ -321,35 +303,67 @@ var MS_PER_UPDATE;
 	
     Me.prototype.draw = function()
     {
-     //disegno il Enemy
+		//disegno il Enemy
+    }
+	
+
+	
+	function Wall(x1,y1,x2,y2  ){
+		this.x1=x1;
+		this.y1=y1;
+		
+		this.x2=x2;
+		this.y2=y2;
+		this.color="red";
+	}
+	
+	
+	
+	
+    Wall.prototype.update = function()
+    {
+     
+	}
+	
+	
+    Wall.prototype.draw = function()
+    {
+	
+	
+	
+		var tpoint=traslate_point(this.x1,this.y1);
+		x1=tpoint.x;
+		y1=tpoint.y;
+		
+		var tpoint=traslate_point(this.x2,this.y2);
+		x2=tpoint.x;
+		y2=tpoint.y;
+		
+	 
+	  
     }
 	
 	
-	
-	
-	
-	
-	
-	
-	
 	/*non serve piu visto che uso la clase Bullet
-	
+
 	function update_bullet(bullet)
 	{ 
-		  var adesso=performance.now();
-		 var timeDiff=adesso-bullet.time+1;
-		 if (timeDiff<1000 && bullet.alive==true)
-		 {
-			 bullet.x=bullet.x-Math.sin(gradiToRadianti(bullet.t))*timeDiff/1000*bullet_speed;
-			 bullet.y=bullet.y-Math.cos(gradiToRadianti(bullet.t))*timeDiff/1000*bullet_speed; 
-		 }
-		 else {bullet.alive=false;}
-		 return bullet;
+		var adesso=performance.now();
+		var timeDiff=adesso-bullet.time+1;
+		if (timeDiff<1000 && bullet.alive==true)
+		{
+			bullet.x=bullet.x-Math.sin(gradiToRadianti(bullet.t))*timeDiff/1000*bullet_speed;
+			bullet.y=bullet.y-Math.cos(gradiToRadianti(bullet.t))*timeDiff/1000*bullet_speed; 
+		}
+		else {bullet.alive=false;}
+		return bullet;
 	}*/
 	//Lets paint the snake now
 	function paint()
 	{
 	
+	var walll=new Wall(50,20,200,200);
+	walll.draw();
 		var current = performance.now();
 		var elapsed = current - previous;
 		previous = current;
@@ -379,10 +393,8 @@ var MS_PER_UPDATE;
 										offset.y=center.y-me.y;
 										offset.x=center.x-me.x;
 												
-											}
-
-  
-  
+										}
+ 
    
 		 if(keyPressed["32"]) {//space 
 										//  bullet_array.push({x:me.x/cw,y:me.y/cw,t:offset.t,time:date.getTime()});
@@ -404,7 +416,7 @@ var MS_PER_UPDATE;
 			lag -= MS_PER_UPDATE;
 		}
 
- 
+
  
 
 		//Lets add the game over clauses now
@@ -454,7 +466,7 @@ var MS_PER_UPDATE;
 		}
 		
 		//	paint me
-		 ctx.fillStyle ="black";
+		ctx.fillStyle ="black";
 		ctx.fillRect(me.x+offset.x -cw/2,me.y+offset.y -cw/2, cw, cw);
 			 
 		//Lets paint the score
@@ -462,17 +474,16 @@ var MS_PER_UPDATE;
 		ctx.fillText(score_text, 5, h-5);
 		
 		 
-		 /// ctx.fillText("  current"+current+"  previous"+previous   +"    lag"+lag+"  elapsed"+elapsed, 25, 25);
-       //  ctx.fillText("OX"+offset.x+" OY"+offset.y+" OT"+offset.t+"   meX"+me.x+"   meY"+me.y, 60, h-60);
-         ctx.fillText(" LIFE: "+me.life+" ARMOR: "+me.armor+ " AMMO: "+me.ammo , 60, h-60);
-/////////////fine  render();
+		// ctx.fillText("  current"+current+"  previous"+previous   +"    lag"+lag+"  elapsed"+elapsed, 25, 25);
+		//  ctx.fillText("OX"+offset.x+" OY"+offset.y+" OT"+offset.t+"   meX"+me.x+"   meY"+me.y, 60, h-60);
+        ctx.fillText(" LIFE: "+me.life+" ARMOR: "+me.armor+ " AMMO: "+me.ammo , 60, h-60);
+		/////////////fine  render();
 		 
 	}
 	//Lets first create a generic function to paint cells
 	function paint_cell(x, y,color1)
 	{
-		 
-		
+		  
 		var tpoint=traslate_point(x,y);
 		x=tpoint.x;
 		y=tpoint.y;
@@ -493,7 +504,7 @@ var MS_PER_UPDATE;
 			ctx.strokeStyle = "white";
 			ctx.strokeRect(x-hpcw, y-hpcw, pcw, pcw);
 			
-     //	 ctx.fillText("    X"+x*cw+"   Y"+y*cw+"   offset.y/cw"+offset.y/cw+"y-((me.y )/cw)"+(y-((me.y )/cw))+" T"+offset.t, x*cw, y*cw);
+			//	 ctx.fillText("    X"+x*cw+"   Y"+y*cw+"   offset.y/cw"+offset.y/cw+"y-((me.y )/cw)"+(y-((me.y )/cw))+" T"+offset.t, x*cw, y*cw);
 
 		}
 		
@@ -507,7 +518,7 @@ var MS_PER_UPDATE;
 		for(var i = 0; i < array.length; i++)
 		{
 			if(array[i].x == x && array[i].y == y)
-			 return true;
+				return true;
 		}
 		return false;
 	}
@@ -515,7 +526,7 @@ var MS_PER_UPDATE;
 	
 	function update( )
 	{
-		 //aggiorna tutto(movimenti dei nemici collisioni proiettili ecc
+		//aggiorna tutto(movimenti dei nemici collisioni proiettili ecc
 		//  check_collision(0, 0, bullet_array);
 		//    alert("nex");
 		for(var i = 0; i < bullet_array.length; i++)
@@ -524,24 +535,29 @@ var MS_PER_UPDATE;
 			//Lets update bullet position
 			 
 			// c=update_bullet(c);
-			 c.update();
-			 if (c.alive==false)
-			 {bullet_array.splice(i,1);//elimino il proiettile
-			 }
-			else{bullet_array[i]=c;}
+			c.update();
+			if (c.alive==false)
+			{
+				bullet_array.splice(i,1);//elimino il proiettile
+			}
+			else{
+				bullet_array[i]=c;
+				}
 		 
 		}
-			for(var i = 0; i < enemy_array.length; i++)
+		for(var i = 0; i < enemy_array.length; i++)
 		{
 			var c = enemy_array[i];
 			//Lets update bullet position
 			 
 			 
-			 c.update(me.x,me.y);
-			 if (c.alive==false)
-			 {enemy_array.splice(i,1);//elimino il proiettile
-			 }
-			else{enemy_array[i]=c;}
+			c.update(me.x,me.y);
+			if (c.alive==false){
+				enemy_array.splice(i,1);//elimino il proiettile
+				}
+			else{
+				enemy_array[i]=c;
+				}
 		 
 		}
 		
@@ -552,13 +568,13 @@ var MS_PER_UPDATE;
 		direction=0;//angolo
 		newx=x-myx;
 		newy=y-myy;
-		 return {x: newx, y: newy};
+		return {x: newx, y: newy};
 		
 		
 	}
 	
-	 function relative_direction(myx,myy,x,y)
-	 {// calcolo la direzione che devo prendere per andare verso un certo punto
+	 function relative_direction(myx,myy,x,y) {
+		// calcolo la direzione che devo prendere per andare verso un certo punto
 		dy = myy -  y;
 		dx = myx -  x;
 		theta = Math.atan2(dy, dx);
@@ -575,34 +591,33 @@ var MS_PER_UPDATE;
 	{
 		return gradi/57.3;
 	}
-function rnd_snd() {
-    return (Math.random()*2-1)+(Math.random()*2-1)+(Math.random()*2-1);
-}
+	function rnd_snd() {
+		return (Math.random()*2-1)+(Math.random()*2-1)+(Math.random()*2-1);
+	}
 	function rnd(mean, stdev) {
-    return Math.round(rnd_snd()*stdev+mean);
-	// per una distribuzione normale provare anche ((Math.random() + Math.random() + Math.random() + Math.random() + Math.random() + Math.random()) - 3) / 3
-}
+		return Math.round(rnd_snd()*stdev+mean);
+		// per una distribuzione normale provare anche ((Math.random() + Math.random() + Math.random() + Math.random() + Math.random() + Math.random()) - 3) / 3
+	}
 
 
 
-function traslate_point(x,y){
+	function traslate_point(x,y){
 		//CALCOLO le coordinate del punto dal piano di gioco al piano visuale
 		radianti=gradiToRadianti(offset.t);//converto i gradi in radianti
 	
-		 //traslo da rispetto alla mia posizione a rispetto a (0,0)
+		//traslo da rispetto alla mia posizione a rispetto a (0,0)
 	 	x=x-((me.x) );
 	 	y=y-((me.y )) ;
 		//nel quadrato di gioco 0 gradi stanno al posto dei classici 90 gradi e la y cresce andando in giu 
-		 var xx=(x*Math.cos(radianti)-y*Math.sin(radianti))+offset.x;
-		 y=(x*Math.sin(radianti)+y*Math.cos(radianti)) +offset.y ;
+		var xx=(x*Math.cos(radianti)-y*Math.sin(radianti))+offset.x;
+		y=(x*Math.sin(radianti)+y*Math.cos(radianti)) +offset.y ;
 	
-		 //risistemo rispetto alla mia posizione
+		//risistemo rispetto alla mia posizione
 		x=xx;
-	     x=x+((me.x));
+	    x=x+((me.x));
 	 	y=y+((me.y ));
 		return{x,y};
-
-}
+	}
 	/*TODO
 	-enemies must move
 	-manage collision
