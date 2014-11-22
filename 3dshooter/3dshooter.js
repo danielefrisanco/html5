@@ -1,3 +1,5 @@
+
+//     file:///home/daniele/Documenti/html5/3dshooter/3dshooter.html
 $(document).ready(function(){
 	//Canvas stuff
 	var canvas = $("#canvas")[0];
@@ -108,8 +110,11 @@ $(document).ready(function(){
 		for(var i = length-1; i>=0; i--)
 		{
 			 
+	var walll=new Wall(Math.round(Math.random()*(w-cw)), Math.round(Math.random()*(h-cw)), Math.round(Math.random()*(w-cw)), Math.round(Math.random()*(h-cw)));
+	
 			//wall_array.push({x: Math.round(Math.random()*(w-cw)/cw), y: Math.round(Math.random()*(h-cw)/cw)});
-			wall_array.push({x: Math.round(Math.random()*(w-cw)), y: Math.round(Math.random()*(h-cw))});// FARE I MURI come matrice o disegnarli come righe memorizzandoli a coppie di punti
+			wall_array.push(walll); 
+			//wall_array.push({x: Math.round(Math.random()*(w-cw)), y: Math.round(Math.random()*(h-cw))});// FARE I MURI come matrice o disegnarli come righe memorizzandoli a coppie di punti
 		}
 		
 		
@@ -218,6 +223,39 @@ $(document).ready(function(){
     Bullet.prototype.draw = function()
     {
 		//disegno il proiettile
+	
+	 
+	 // USARE UNA FUNZIONE 
+	 var tpoint=traslate_point(this.x,this.y);
+		x=tpoint.x;
+		y=tpoint.y;
+	 
+		// calcolo le dimensioni in base alla prospettiva
+		
+		
+		//trovo la dimensione del punto da disegnare PROPORZIOnale alla distanza da me
+		pcw=(1-distanza(center.x,center.y,x,y)/default_dist)*cw;
+		// pcw=cw;
+		if (!(x == -1 || x == w || y == -1 || y == h))
+		{
+		 
+			hpcw=pcw/2;//half pcw , x e y sono il centro
+		  
+			ctx.fillStyle = this.color;
+			ctx.fillRect(x-hpcw,(y)-hpcw, pcw, pcw);
+			ctx.strokeStyle = "white";
+			ctx.strokeRect(x-hpcw, y-hpcw, pcw, pcw);
+			
+			//	 ctx.fillText("    X"+x*cw+"   Y"+y*cw+"   offset.y/cw"+offset.y/cw+"y-((me.y )/cw)"+(y-((me.y )/cw))+" T"+offset.t, x*cw, y*cw);
+
+		} 
+	 
+	 
+	 
+	 
+		
+		
+		
     }
 	
 	
@@ -258,6 +296,40 @@ $(document).ready(function(){
     Enemy.prototype.draw = function()
     {
      //disegno il Enemy
+	 
+	 
+	 // USARE UNA FUNZIONE 
+	 var tpoint=traslate_point(this.x,this.y);
+		x=tpoint.x;
+		y=tpoint.y;
+	 
+		// calcolo le dimensioni in base alla prospettiva
+		
+		
+		//trovo la dimensione del punto da disegnare PROPORZIOnale alla distanza da me
+		pcw=(1-distanza(center.x,center.y,x,y)/default_dist)*cw;
+		// pcw=cw;
+		if (!(x == -1 || x == w || y == -1 || y == h))
+		{
+		 
+			hpcw=pcw/2;//half pcw , x e y sono il centro
+		  
+			ctx.fillStyle = this.color;
+			ctx.fillRect(x-hpcw,(y)-hpcw, pcw, pcw);
+			ctx.strokeStyle = "white";
+			ctx.strokeRect(x-hpcw, y-hpcw, pcw, pcw);
+			
+			//	 ctx.fillText("    X"+x*cw+"   Y"+y*cw+"   offset.y/cw"+offset.y/cw+"y-((me.y )/cw)"+(y-((me.y )/cw))+" T"+offset.t, x*cw, y*cw);
+
+		} 
+	 
+	 
+	 
+	 
+	 
+	 
+	 
+	 
     }
 	
 	
@@ -322,7 +394,7 @@ $(document).ready(function(){
 	
     Wall.prototype.update = function()
     {
-     
+		 
 	}
 	
 	
@@ -338,8 +410,13 @@ $(document).ready(function(){
 		var tpoint=traslate_point(this.x2,this.y2);
 		x2=tpoint.x;
 		y2=tpoint.y;
+		 
+			ctx.strokeStyle = this.color;
 		
-	 
+			ctx.moveTo(x1, y1  );
+			ctx.lineTo(  x2 , y2 ); 
+		
+	
 	  
     }
 	
@@ -362,8 +439,6 @@ $(document).ready(function(){
 	function paint()
 	{
 	
-	var walll=new Wall(50,20,200,200);
-	walll.draw();
 		var current = performance.now();
 		var elapsed = current - previous;
 		previous = current;
@@ -433,7 +508,10 @@ $(document).ready(function(){
 		
 		
 	 ////////////// render();
-		for(var i = 0; i < enemy_array.length; i++)
+	 
+	 
+	 draw();
+	/*	for(var i = 0; i < enemy_array.length; i++)
 		{
 			var c = enemy_array[i];
 			//Lets paint 10px wide cells
@@ -449,7 +527,7 @@ $(document).ready(function(){
 			var c = wall_array[i];
 			//Lets paint 10px wide cells
 			 
-			paint_cell(c.x, c.y,"red");
+			//paint_cell(c.x, c.y,"red");
 		 
 		 
 		}
@@ -463,7 +541,7 @@ $(document).ready(function(){
 			paint_cell(c.x, c.y,"green");
 		 
 		 
-		}
+		}*/
 		
 		//	paint me
 		ctx.fillStyle ="black";
@@ -478,6 +556,7 @@ $(document).ready(function(){
 		//  ctx.fillText("OX"+offset.x+" OY"+offset.y+" OT"+offset.t+"   meX"+me.x+"   meY"+me.y, 60, h-60);
         ctx.fillText(" LIFE: "+me.life+" ARMOR: "+me.armor+ " AMMO: "+me.ammo , 60, h-60);
 		/////////////fine  render();
+		
 		 
 	}
 	//Lets first create a generic function to paint cells
@@ -506,8 +585,7 @@ $(document).ready(function(){
 			
 			//	 ctx.fillText("    X"+x*cw+"   Y"+y*cw+"   offset.y/cw"+offset.y/cw+"y-((me.y )/cw)"+(y-((me.y )/cw))+" T"+offset.t, x*cw, y*cw);
 
-		}
-		
+		} 
 		//ctx.fillText("   me.y"+me.y+"  me.x"+me.x   +"    offset.t"+ offset.t+"  cos"+Math.cos(gradiToRadianti(360-offset.t)) +"  sin"+Math.sin(gradiToRadianti(360-offset.t)) , 25, 25);
 	}
 	
@@ -541,6 +619,7 @@ $(document).ready(function(){
 				bullet_array.splice(i,1);//elimino il proiettile
 			}
 			else{
+				 
 				bullet_array[i]=c;
 				}
 		 
@@ -548,21 +627,75 @@ $(document).ready(function(){
 		for(var i = 0; i < enemy_array.length; i++)
 		{
 			var c = enemy_array[i];
-			//Lets update bullet position
+			//Lets update  position
 			 
 			 
 			c.update(me.x,me.y);
 			if (c.alive==false){
-				enemy_array.splice(i,1);//elimino il proiettile
+				enemy_array.splice(i,1);//elimino   
 				}
 			else{
+			 
 				enemy_array[i]=c;
 				}
 		 
-		}
+		}	
+			 
+		for(var i = 0; i < wall_array.length; i++)
+		{
+			var c = wall_array[i];
+			//Lets update   position
+			 
+			 
+			c.update(me.x,me.y);
+			if (c.alive==false){
+				wall_array.splice(i,1);//elimino 
+				}
+			else{
+			
+			 
+				wall_array[i]=c;
+				
+				}
+					
+		 
+		} 
+		
 		
 
 	}
+	
+	function draw(){
+	
+	
+	ctx.beginPath(  ); 
+		for(var i = 0; i < bullet_array.length; i++)
+		{
+			 bullet_array[i].draw(); 
+		 
+		}
+		for(var i = 0; i < enemy_array.length; i++)
+		{
+			 
+				enemy_array[i].draw(); 
+		 
+		}	
+			 
+		for(var i = 0; i < wall_array.length; i++)
+		{
+	 
+			 
+			
+				 wall_array[i].draw();
+				 
+					
+		 
+		}
+		  ctx.stroke(  ); 
+	
+	}
+	
+	
 	function relative_position(myx,myy,x,y,direction)
 	{
 		direction=0;//angolo
