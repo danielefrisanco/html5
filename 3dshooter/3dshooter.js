@@ -105,16 +105,49 @@ $(document).ready(function(){
 			x: Math.round(Math.random()*(w-cw)/cw), 
 			y: Math.round(Math.random()*(h-cw)/cw), 
 		};*/
+		var len=1;
 		var length = 5; // 
 		wall_array = []; //Empty array to start with
+		
+			/*	 var walll=new Wall(0, 0, w,0);
+				wall_array.push(walll); 	
+				  walll=new Wall(0, h, w,0);
+				wall_array.push(walll); 	
+				  walll=new Wall(0, 0, 0,h);
+				wall_array.push(walll); 	
+				  walll=new Wall(w, 0, w,h);
+				wall_array.push(walll); 	*/
 		for(var i = length-1; i>=0; i--)
 		{
-			 
-	var walll=new Wall(Math.round(Math.random()*(w-cw)), Math.round(Math.random()*(h-cw)), Math.round(Math.random()*(w-cw)), Math.round(Math.random()*(h-cw)));
+	 
+				
+		/*	for(var k= 0; k<len;k++)
+			{ */
+				var a,b,c,d,p,q,r,s;
+				 
+				 var  walll=new Wall(Math.round(Math.random()*(w-cw)), Math.round(Math.random()*(h-cw)), Math.round(Math.random()*(w-cw)), Math.round(Math.random()*(h-cw)));
+
+			/*	a=walll.x1;SBAGLIATO QUI
+				b=walll.y1;
+				c=walll.x2;
+				d=walll.y2; 
+				p=wall_array[k].x1;
+				q=wall_array[k].y1;
+				r=wall_array[k].x2;
+				s=wall_array[k].y2;
+		
+	 
+		
+				if  (intersects( a,b,c,d,p,q,r,s))
+				{*/
+					//wall_array.push({x: Math.round(Math.random()*(w-cw)/cw), y: Math.round(Math.random()*(h-cw)/cw)});
+					wall_array.push(walll); 
+					//wall_array.push({x: Math.round(Math.random()*(w-cw)), y: Math.round(Math.random()*(h-cw))});// FARE I MURI come matrice o disegnarli come righe memorizzandoli a coppie di punti
+				
+			/*	}
+	len=wall_array.length;
+			}*/
 	
-			//wall_array.push({x: Math.round(Math.random()*(w-cw)/cw), y: Math.round(Math.random()*(h-cw)/cw)});
-			wall_array.push(walll); 
-			//wall_array.push({x: Math.round(Math.random()*(w-cw)), y: Math.round(Math.random()*(h-cw))});// FARE I MURI come matrice o disegnarli come righe memorizzandoli a coppie di punti
 		}
 		
 		
@@ -751,6 +784,32 @@ $(document).ready(function(){
 	 	y=y+((me.y ));
 		return{x,y};
 	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	// returns true iff the line from (a,b)->(c,d) intersects with (p,q)->(r,s)
+function intersects(a,b,c,d,p,q,r,s) {
+  var det, gamma, lambda;
+  det = (c - a) * (s - q) - (r - p) * (d - b);
+  if (det === 0) {
+    return false;
+  } else {
+    lambda = ((s - q) * (r - a) + (p - r) * (s - b)) / det;
+    gamma = ((b - d) * (r - a) + (c - a) * (s - b)) / det;
+    return (0 < lambda && lambda < 1) && (0 < gamma && gamma < 1);
+  }
+};
+	
+	
+	
+	
 	/*TODO
 	-enemies must move
 	-manage collision
