@@ -335,12 +335,12 @@ $(document).ready(function(){
 
 		} 
 	 
-    }
+    } 
 	
 	
 	function Me(xpos,ypos,direction,currentTime){
 	
-	// Me should be a subclass of Enemy (or both class should be a subclass of something else) because many things are in common(what changes is that Me is commanded by the player )
+		// Me should be a subclass of Enemy (or both class should be a subclass of something else) because many things are in common(what changes is that Me is commanded by the player )
 		this.x=xpos;
 		this.y=ypos;
 		this.t=direction;
@@ -372,7 +372,7 @@ $(document).ready(function(){
 
 		}
 		
-		 		if (this.checkCollisions(0)){alert("collisione");}
+		 	//	if (this.checkCollisions(0)){alert("collisione");}
     }
 	
     Me.prototype.draw = function()
@@ -734,7 +734,10 @@ $(document).ready(function(){
 	}
 
 	
-	
+	function pointToLineDistance( x,y,p,q,r,s){
+
+	return"dafare: trovare y=mx+q e poi ci sono le formle";
+	}
 	
 	/*TODO
 	-enemies must move
