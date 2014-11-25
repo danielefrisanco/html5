@@ -121,7 +121,7 @@ $(document).ready(function(){
 		for(var i = length-1; i>=0; i--)
 		{
 	
-			do{
+			do{//finchè non esce un muro che non si interseca con gli altri
 				interseca=false;
 				p=Math.round(Math.random()*(w-cw));
 				q=Math.round(Math.random()*(h-cw));
@@ -273,15 +273,7 @@ $(document).ready(function(){
 
 		} 
 	 
-	 
-	 
-	 
-		
-		
-		
     }
-	
-	
 	
 	function Enemy(xpos,ypos,direction,currentTime){
 		this.x=xpos;
@@ -292,8 +284,6 @@ $(document).ready(function(){
 		this.speed=enemy_speed; 
 		this.color="blue";
 	}
-	
-	
 	
 	
     Enemy.prototype.update = function(x_target,y_target)
@@ -314,7 +304,6 @@ $(document).ready(function(){
 			}
 		 
     }
-	
 	
     Enemy.prototype.draw = function()
     {
@@ -346,18 +335,12 @@ $(document).ready(function(){
 
 		} 
 	 
-	 
-	 
-	 
-	 
-	 
-	 
-	 
     }
 	
 	
-	
 	function Me(xpos,ypos,direction,currentTime){
+	
+	// Me should be a subclass of Enemy (or both class should be a subclass of something else) because many things are in common(what changes is that Me is commanded by the player )
 		this.x=xpos;
 		this.y=ypos;
 		this.t=direction;
@@ -372,13 +355,10 @@ $(document).ready(function(){
 	}
 	
 	
-	
     Me.prototype.update = function(x_target,y_target)
     { 
 	
-	
-		
-		 
+	 
     }
 	
     Me.prototype.shoot = function( )
@@ -392,16 +372,22 @@ $(document).ready(function(){
 
 		}
 		
-		
-		 
+		 		if (this.checkCollisions(0)){alert("collisione");}
     }
 	
     Me.prototype.draw = function()
     {
 		//disegno il Enemy
     }
-	
-
+	Me.prototype.checkCollisions=function(){
+		// check that i don't collide with walls or enemies 
+		//do i need to add a timestamp to be sure ? maybe just for bullets
+		
+		//  do a function inside Wall class that tells me if myself lays over a wall 
+		// do a function in Enemy to check if the instance of the enemy collide with the area that i pass to him
+		
+		return true;// si puo ritornare ???
+	}
 	
 	function Wall(x1,y1,x2,y2  ){
 		this.x1=x1;
@@ -409,23 +395,18 @@ $(document).ready(function(){
 		
 		this.x2=x2;
 		this.y2=y2;
+		
 		this.color="red";
 	}
-	
-	
-	
 	
     Wall.prototype.update = function()
     {
 		 
 	}
 	
-	
     Wall.prototype.draw = function()
     {
-	
-	
-	
+
 		var tpoint=traslate_point(this.x1,this.y1);
 		x1=tpoint.x;
 		y1=tpoint.y;
@@ -434,32 +415,16 @@ $(document).ready(function(){
 		x2=tpoint.x;
 		y2=tpoint.y;
 		 
-			ctx.strokeStyle = this.color;
+		ctx.strokeStyle = this.color;
 		
-			ctx.moveTo(x1, y1  );
-			ctx.lineTo(  x2 , y2 ); 
+		ctx.moveTo(x1, y1  );
+		ctx.lineTo(  x2 , y2 ); 
 		
-	
-	  
     }
 	
 
 
-	/*non serve piu visto che uso la clase Bullet
-
-	function update_bullet(bullet)
-	{ 
-		var adesso=performance.now();
-		var timeDiff=adesso-bullet.time+1;
-		if (timeDiff<1000 && bullet.alive==true)
-		{
-			bullet.x=bullet.x-Math.sin(gradiToRadianti(bullet.t))*timeDiff/1000*bullet_speed;
-			bullet.y=bullet.y-Math.cos(gradiToRadianti(bullet.t))*timeDiff/1000*bullet_speed; 
-		}
-		else {bullet.alive=false;}
-		return bullet;
-	}*/
-	//Lets paint the snake now
+	
 	function paint()
 	{
 	
@@ -475,10 +440,9 @@ $(document).ready(function(){
 		ctx.strokeStyle = "black";
 		ctx.strokeRect(0, 0, w, h);
 
-
 		  //processInput();
-		if(keyPressed["37"]) { offset.t =(offset.t+6)%360;}
-		if(keyPressed["39"]) { offset.t=(offset.t-6)%360;}
+		if(keyPressed["37"]) { offset.t =(offset.t+3)%360;}
+		if(keyPressed["39"]) { offset.t=(offset.t-3)%360;}
 		if(keyPressed["38"]) {    //mi devo spostare in su rispetto all'area di gioco ma lo converto nel piano cartesiano
 										me.y=me.y- Math.cos(gradiToRadianti(360-offset.t));  
 										me.x=me.x+Math.sin(gradiToRadianti(360-offset.t));   
@@ -517,7 +481,6 @@ $(document).ready(function(){
 
 
  
-
 		//Lets add the game over clauses now
 		//This will restart the game if the snake hits the wall
 		//Lets add the code for body collision
@@ -625,7 +588,6 @@ $(document).ready(function(){
 		return false;
 	}
 	
-	
 	function update( )
 	{
 		//aggiorna tutto(movimenti dei nemici collisioni proiettili ecc
@@ -653,7 +615,6 @@ $(document).ready(function(){
 			var c = enemy_array[i];
 			//Lets update  position
 			 
-			 
 			c.update(me.x,me.y);
 			if (c.alive==false){
 				enemy_array.splice(i,1);//elimino   
@@ -670,55 +631,40 @@ $(document).ready(function(){
 			var c = wall_array[i];
 			//Lets update   position
 			 
-			 
 			c.update(me.x,me.y);
 			if (c.alive==false){
 				wall_array.splice(i,1);//elimino 
 				}
 			else{
-			
-			 
 				wall_array[i]=c;
 				
 				}
 					
-		 
 		} 
-		
-		
 
 	}
 	
 	function draw(){
 	
-	
-	ctx.beginPath(  ); 
+		ctx.beginPath(  ); 
 		for(var i = 0; i < bullet_array.length; i++)
 		{
 			 bullet_array[i].draw(); 
-		 
 		}
 		for(var i = 0; i < enemy_array.length; i++)
 		{
-			 
 				enemy_array[i].draw(); 
-		 
 		}	
 			 
 		for(var i = 0; i < wall_array.length; i++)
 		{
-	 
-			 
-			
+		
 				 wall_array[i].draw();
 				 
-					
-		 
 		}
 		  ctx.stroke(  ); 
 	
 	}
-	
 	
 	function relative_position(myx,myy,x,y,direction)
 	{
@@ -726,7 +672,6 @@ $(document).ready(function(){
 		newx=x-myx;
 		newy=y-myy;
 		return {x: newx, y: newy};
-		
 		
 	}
 	
@@ -757,7 +702,6 @@ $(document).ready(function(){
 	}
 
 
-
 	function traslate_point(x,y){
 		//CALCOLO le coordinate del punto dal piano di gioco al piano visuale
 		radianti=gradiToRadianti(offset.t);//converto i gradi in radianti
@@ -776,8 +720,6 @@ $(document).ready(function(){
 		return{x,y};
 	}
 	
-	
-	
 	// returns true iff the line from (a,b)->(c,d) intersects with (p,q)->(r,s)
 	function intersects(a,b,c,d,p,q,r,s) {
 		var det, gamma, lambda;
@@ -791,12 +733,6 @@ $(document).ready(function(){
 		}
 	}
 
-	
-	
-	
-	
-	
-	
 	
 	
 	
@@ -820,7 +756,6 @@ $(document).ready(function(){
 	
 	
 	*/
-	
 	
 	
 	/*
@@ -850,5 +785,4 @@ $(document).ready(function(){
 											function(e) {   keyPressed[e.keyCode] = false;},
 											false);
   
-	
 })
