@@ -48,8 +48,8 @@ $(document).ready(function () {
 		//every 60ms
 
 
-		create_enemy();
 		create_wall();
+		create_enemy();
 		if (typeof game_loop != "undefined")
 			clearInterval(game_loop);
 		game_loop = setInterval(paint, 1000 / 60);
@@ -89,12 +89,23 @@ $(document).ready(function () {
 	 */
 	function create_enemy() {
 		var length = 5; //
+		var en,
+		a,
+		b;
 		enemy_array = []; //Empty array to start with
 		for (var i = length - 1; i >= 0; i--) {
 			//This will create a enemies
 			//enemy_array.push({x: Math.round(Math.random()*(w-cw)/cw), y: Math.round(Math.random()*(h-cw)/cw)});
 			//	enemy_array.push({x: Math.round(Math.random()*(w-cw)), y: Math.round(Math.random()*(h-cw))});
-			enemy_array.push(new Enemy(Math.round(Math.random() * (w - cw)), Math.round(Math.random() * (h - cw)), Math.random() * 360, performance.now()));
+
+		//	do {
+				a = Math.round(Math.random() * (w - cw));
+				b = Math.round(Math.random() * (h - cw));
+				en = new Enemy(a, b, Math.random() * 360, performance.now());
+			 
+//VA SISTEMATA LA CREAZIONE DEI NEMICI IN MODO CHE non stiano sopra ai muri
+			//} while (en.checkCollisions (w, h,wall_array))
+			enemy_array.push(en);
 		}
 	}
 
@@ -186,11 +197,6 @@ $(document).ready(function () {
 
 
 
-
-
-
-
-
 	 */
 
 	//per poter usare questo Bullet CLASSE
@@ -257,22 +263,44 @@ $(document).ready(function () {
 		this.alive = true;
 		this.speed = enemy_speed;
 		this.color = "blue";
+		this.x_target = 0;
+		this.y_target = 0;
 	}
 
 	Enemy.prototype.update = function (x_target, y_target) {
+		var a,
+		b;
 
-		var rd = relative_direction(this.x, this.y, x_target, y_target);
-		this.t = rnd(rd, 40);
+		if (this.x_target == 0 && this.y_target == 0) {
+			this.x_target = x_target;
+			this.y_target = y_target;
+		}
+		var rd = relative_direction(this.x, this.y, this.x_target, this.y_target);
+
 		var adesso = performance.now();
 		var timeDiff = adesso - this.time + 1;
 		this.time = adesso;
 		if (this.alive == true) {
-			this.x = this.x - Math.sin(gradiToRadianti(this.t)) * timeDiff / 1000 * this.speed;
-			this.y = this.y - Math.cos(gradiToRadianti(this.t)) * timeDiff / 1000 * this.speed;
+
+			do {
+				//da fare una funzione ppiu furba per dare la direzione
+				if (this.x_target == 0 && this.y_target == 0) {
+					this.x_target = x_target;
+					this.y_target = y_target;
+				}
+				var rd = relative_direction(this.x, this.y, this.x_target, this.y_target);
+				this.t = rnd(rd, 40);
+				a = this.x - Math.sin(gradiToRadianti(this.t)) * timeDiff / 1000 * this.speed;
+				b = this.y - Math.cos(gradiToRadianti(this.t)) * timeDiff / 1000 * this.speed;
+
+				rd = this.t;
+			} while (this.checkCollisions(a, b, wall_array))
+			this.y = b;
+			this.x = a;
 		} else {
 			this.alive = false;
 		}
-
+		return this.alive;
 	}
 
 	Enemy.prototype.draw = function () {
@@ -283,8 +311,7 @@ $(document).ready(function () {
 		var tpoint = traslate_point(this.x, this.y);
 		x = tpoint.x;
 		y = tpoint.y;
- 
- 
+
 		//calculate the dimension proportionally to the distance from me
 		pcw = (1 - distanza(center.x, center.y, x, y) / default_dist) * cw;
 		// pcw=cw;
@@ -303,6 +330,24 @@ $(document).ready(function () {
 
 	}
 
+	Enemy.prototype.checkCollisions = function (xnew, ynew, v) {
+		// check that i don't collide with walls or enemies
+
+		for (var i = 0; i < v.length; i++) {
+
+			if (v[i].checkCollision(xnew, ynew, cw / 2)) { {
+					this.x_target = v[i].x1;
+					this.y_target = v[i].y1;
+				}
+				return true;
+			}
+
+		}
+		this.x_target = 0;
+		this.y_target = 0;
+		return false;
+	}
+
 	function Me(xpos, ypos, direction, currentTime) {
 
 		// Me should be a subclass of Enemy (or both class should be a subclass of something else) because many things are in common(what changes is that Me is commanded by the player )
@@ -317,6 +362,7 @@ $(document).ready(function () {
 		this.life = 100;
 		this.armor = 100;
 		this.last_shot_time = currentTime;
+
 	}
 
 	Me.prototype.update = function (what) {
@@ -324,26 +370,25 @@ $(document).ready(function () {
 		b;
 		b = this.y;
 		a = this.x;
-		if (what == "up") {
+
+		switch (what) {
+		case "up":
 			b = this.y - Math.cos(gradiToRadianti(360 - this.t));
 			a = this.x + Math.sin(gradiToRadianti(360 - this.t));
-
-		}
-
-		if (what == "down") {
+			break;
+		case "down":
 			b = me.y + Math.cos(gradiToRadianti(360 - this.t));
 			a = me.x - Math.sin(gradiToRadianti(360 - this.t));
-		}
-		if (what == "left") {
+			break;
+		case "left":
 			this.t = (this.t + 3) % 360; // devo usare this.t ovunque
-		}
-
-		if (what == "right") {
+			break;
+		case "right":
 			this.t = (this.t - 3) % 360;
+			break;
 		}
-
 		if (!this.checkCollisions(a, b, wall_array)) {
-
+			// dont collide with a wall
 			this.y = b;
 			this.x = a;
 		}
@@ -427,7 +472,7 @@ $(document).ready(function () {
 		var elapsed = current - previous;
 		previous = current;
 		lag += elapsed;
- 
+
 		//Lets paint the canvas now
 		ctx.fillStyle = "white";
 		ctx.fillRect(0, 0, w, h);
@@ -533,7 +578,8 @@ $(document).ready(function () {
 
 	}
 	//Lets first create a generic function to paint cells
-	function/*DEPRECATEDs*/ paint_cell(x, y, color1) {
+	function /*DEPRECATEDs*/
+	paint_cell(x, y, color1) {
 
 		var tpoint = traslate_point(x, y);
 		x = tpoint.x;
