@@ -104,6 +104,7 @@ $(document).ready(function () {
 				en = new Enemy(a, b, Math.random() * 360, performance.now());
 			 
 //VA SISTEMATA LA CREAZIONE DEI NEMICI IN MODO CHE non stiano sopra ai muri
+//il sistema dei muri andrebbe un po ripensato
 			//} while (en.checkCollisions (w, h,wall_array))
 			enemy_array.push(en);
 		}
