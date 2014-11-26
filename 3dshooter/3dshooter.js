@@ -355,11 +355,32 @@ $(document).ready(function(){
 	}
 	
 	
-    Me.prototype.update = function(x_target,y_target)
+    Me.prototype.update = function(what)
     { 
-	
+		var a,b;
+		b=this.y;
+		a=this.x;
+		if (what=="up"){
+			b=this.y- Math.cos(gradiToRadianti(360-this.t));  
+			a= this.x+Math.sin(gradiToRadianti(360-this.t));   
+			
+		}
+
+		if (what=="down"){					
+			b=me.y+Math.cos(gradiToRadianti(360-this.t));
+			a=me.x-Math.sin(gradiToRadianti(360-this.t));   		
+		}
+	 	if (what=="left"){		
+			this.t =(this.t+3)%360;// devo usare this.t ovunque
+		}
 	 
-    }
+		if (what=="right"){
+			this.t =(this.t-3)%360;
+		}
+		if(!this.checkCollisions(a,b,wall_array )){
+				this.y=b;
+				this.x=a;}
+	}
 	
     Me.prototype.shoot = function( )
     { 
@@ -367,7 +388,7 @@ $(document).ready(function(){
 		if (this.last_shot_time+200<=adesso && 	this.ammo>0)
 		{
 			this.last_shot_time =adesso;
-			bullet_array.push(new Bullet(this.x,this.y,offset.t,adesso));
+			bullet_array.push(new Bullet(this.x,this.y,this.t,adesso));
 			this.ammo--;
 
 		}
@@ -379,15 +400,34 @@ $(document).ready(function(){
     {
 		//disegno il Enemy
     }
-	Me.prototype.checkCollisions=function(){
+	Me.prototype.checkCollisions=function(xnew,ynew,v){
 		// check that i don't collide with walls or enemies 
 		//do i need to add a timestamp to be sure ? maybe just for bullets
 		
 		//  do a function inside Wall class that tells me if myself lays over a wall 
 		// do a function in Enemy to check if the instance of the enemy collide with the area that i pass to him
-		
-		return true;// si puo ritornare ???
+		for(var i = 0; i < v.length; i++)
+		{
+		 
+			 
+		 
+		    if ( v[i].checkCollision(xnew,ynew,cw/2))
+			{return true;}
+	   
+			 
+					
+		}  
+		return false;
 	}
+	
+		
+	
+	
+	
+	
+	
+	
+	
 	
 	function Wall(x1,y1,x2,y2  ){
 		this.x1=x1;
@@ -422,9 +462,16 @@ $(document).ready(function(){
 		
     }
 	
-
-
+ 
+	 Wall.prototype.checkCollision = function(a,b,r)
+    {
 	
+  if (r>pointToLineDistance( a,b,this.x1,this.y1,this.x2,this.y2)){return true;}
+  return false ;
+		
+    }
+	
+
 	function paint()
 	{
 	
@@ -441,18 +488,19 @@ $(document).ready(function(){
 		ctx.strokeRect(0, 0, w, h);
 
 		  //processInput();
-		if(keyPressed["37"]) { offset.t =(offset.t+3)%360;}
-		if(keyPressed["39"]) { offset.t=(offset.t-3)%360;}
+		if(keyPressed["37"]) { 	me.update("left");}
+		if(keyPressed["39"]) { 	me.update("right");}
 		if(keyPressed["38"]) {    //mi devo spostare in su rispetto all'area di gioco ma lo converto nel piano cartesiano
-										me.y=me.y- Math.cos(gradiToRadianti(360-offset.t));  
-										me.x=me.x+Math.sin(gradiToRadianti(360-offset.t));   
+									
+										me.update("up");
 										offset.y=center.y-me.y;
 										offset.x=center.x-me.x;
+								
 										  
 										}
 		if(keyPressed["40"]) {  	   //mi devo spostare in giu rispetto all'area di gioco ma lo converto nel piano cartesiano
-										me.y=me.y+Math.cos(gradiToRadianti(360-offset.t));
-										me.x=me.x-Math.sin(gradiToRadianti(360-offset.t));   
+				me.update("down");
+										
 										offset.y=center.y-me.y;
 										offset.x=center.x-me.x;
 												
@@ -632,12 +680,14 @@ $(document).ready(function(){
 			//Lets update   position
 			 
 			c.update(me.x,me.y);
+		 c.checkCollision(me.x,me.y,cw)
+	   
 			if (c.alive==false){
 				wall_array.splice(i,1);//elimino 
 				}
 			else{
 				wall_array[i]=c;
-				
+				 
 				}
 					
 		} 
@@ -704,7 +754,7 @@ $(document).ready(function(){
 
 	function traslate_point(x,y){
 		//CALCOLO le coordinate del punto dal piano di gioco al piano visuale
-		radianti=gradiToRadianti(offset.t);//converto i gradi in radianti
+		radianti=gradiToRadianti(me.t);//converto i gradi in radianti
 	
 		//traslo da rispetto alla mia posizione a rispetto a (0,0)
 	 	x=x-((me.x) );
@@ -735,10 +785,22 @@ $(document).ready(function(){
 
 	
 	function pointToLineDistance( x,y,p,q,r,s){
-
-	return"dafare: trovare y=mx+q e poi ci sono le formle";
+return distToSegment({x:x,y:y},{x:p,y:q},{x:r,y:s});
+	 
 	}
-	
+	function sqr(x) { return x * x; }
+function dist2(v, w) { return sqr(v.x - w.x) + sqr(v.y - w.y) ;}
+function distToSegmentSquared(p, v, w) {
+ 
+  var l2 = dist2(v, w);
+  if (l2 == 0) return dist2(p, v);
+  var t = ((p.x - v.x) * (w.x - v.x) + (p.y - v.y) * (w.y - v.y)) / l2;
+  if (t < 0) return dist2(p, v);
+  if (t > 1) return dist2(p, w);
+  return dist2(p, { x: v.x + t * (w.x - v.x),
+                    y: v.y + t * (w.y - v.y) });
+}
+function distToSegment(p, v, w) { return Math.sqrt(distToSegmentSquared(p, v, w));}
 	/*TODO
 	-enemies must move
 	-manage collision
