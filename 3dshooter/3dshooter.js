@@ -1,4 +1,4 @@
-
+/* 2014 DANIELE FRISANCO*/
 //     file:///home/daniele/Documenti/html5/3dshooter/3dshooter.html
 $(document).ready(function () {
 	//Canvas stuff
@@ -102,9 +102,10 @@ $(document).ready(function () {
 				a = Math.round(Math.random() * (w - cw));
 				b = Math.round(Math.random() * (h - cw));
 				en = new Enemy(a, b, Math.random() * 360, performance.now());
-			 
+		
+		
 //VA SISTEMATA LA CREAZIONE DEI NEMICI IN MODO CHE non stiano sopra ai muri
-//il sistema dei muri andrebbe un po ripensato
+//il sistema dei muri andrebbe un po ripensato 
 			//} while (en.checkCollisions (w, h,wall_array))
 			enemy_array.push(en);
 		}
@@ -333,7 +334,7 @@ $(document).ready(function () {
 
 	Enemy.prototype.checkCollisions = function (xnew, ynew, v) {
 		// check that i don't collide with walls or enemies
-
+ 
 		for (var i = 0; i < v.length; i++) {
 
 			if (v[i].checkCollision(xnew, ynew, cw / 2)) { {
