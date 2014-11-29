@@ -338,6 +338,18 @@ $(document).ready(function () {
 		for (var i = 0; i < v.length; i++) {
 
 			if (v[i].checkCollision(xnew, ynew, cw / 2)) { {
+			
+			
+			/*
+			
+			
+			Mi segno un po' di appunti:per far muovere i nemicisi potrebbe fare un sistema che se il muro è piu vicino delala distanza 
+			da Me allora segue il muro, se me è piu vicini segue me.
+			il problema è una volta arrivato alla fine del muro che fa? e poi x1y1 non sempre va bene
+
+			
+			
+			*/
 					this.x_target = v[i].x1;
 					this.y_target = v[i].y1;
 				}
