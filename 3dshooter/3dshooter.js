@@ -336,23 +336,26 @@ $(document).ready(function () {
 		// check that i don't collide with walls or enemies
  
 		for (var i = 0; i < v.length; i++) {
-
-			if (v[i].checkCollision(xnew, ynew, cw / 2)) { {
+			var collides=v[i].checkCollision(xnew, ynew, cw / 2)
+			if (collides) { 
 			
 			
 			/*
 			
+			 
 			
-			Mi segno un po' di appunti:per far muovere i nemicisi potrebbe fare un sistema che se il muro è piu vicino delala distanza 
-			da Me allora segue il muro, se me è piu vicini segue me.
-			il problema è una volta arrivato alla fine del muro che fa? e poi x1y1 non sempre va bene
-
 			
+			collides va bene ma dovrei  fare molto altro
+			
+			FARE UNA FUNZIONE CHE MI DICE se l'enemy si trova dietro un muro rispetto a me
+			in questo caso mi muovo con la aggira muro , altrimenti vado diretto verso il bersaglio 30 NOVEMBRE 
 			
 			*/
+			if (Math.abs(collides)<Math.abs(distanza(me.x, me.y, this.x, this.y))){
+			 
 					this.x_target = v[i].x1;
-					this.y_target = v[i].y1;
-				}
+					this.y_target = v[i].y1;}
+				 
 				return true;
 			}
 
@@ -472,9 +475,9 @@ $(document).ready(function () {
 	}
 
 	Wall.prototype.checkCollision = function (a, b, r) {
-
-		if (r > pointToLineDistance(a, b, this.x1, this.y1, this.x2, this.y2)) {
-			return true;
+		var  ptld=pointToLineDistance(a, b, this.x1, this.y1, this.x2, this.y2);
+		if (r >ptld) {
+			return ptld;
 		}
 		return false;
 
