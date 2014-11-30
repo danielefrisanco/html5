@@ -27,7 +27,7 @@ $(document).ready(function () {
 	var previous;
 	var lag;
 	var MS_PER_UPDATE;
-
+	var state;
 	function init() {
 		d = "right"; //default direction
 
@@ -47,7 +47,7 @@ $(document).ready(function () {
 		//Lets move the snake now using a timer which will trigger the paint function
 		//every 60ms
 
-
+		state = 0; // DEBUG 30 nov
 		create_wall();
 		create_enemy();
 		if (typeof game_loop != "undefined")
@@ -98,14 +98,13 @@ $(document).ready(function () {
 			//enemy_array.push({x: Math.round(Math.random()*(w-cw)/cw), y: Math.round(Math.random()*(h-cw)/cw)});
 			//	enemy_array.push({x: Math.round(Math.random()*(w-cw)), y: Math.round(Math.random()*(h-cw))});
 
-		//	do {
-				a = Math.round(Math.random() * (w - cw));
-				b = Math.round(Math.random() * (h - cw));
-				en = new Enemy(a, b, Math.random() * 360, performance.now());
-		
-		
-//VA SISTEMATA LA CREAZIONE DEI NEMICI IN MODO CHE non stiano sopra ai muri
-//il sistema dei muri andrebbe un po ripensato 
+			//	do {
+			a = Math.round(Math.random() * (w - cw));
+			b = Math.round(Math.random() * (h - cw));
+			en = new Enemy(a, b, Math.random() * 360, performance.now());
+
+			//VA SISTEMATA LA CREAZIONE DEI NEMICI IN MODO CHE non stiano sopra ai muri
+			//il sistema dei muri andrebbe un po ripensato
 			//} while (en.checkCollisions (w, h,wall_array))
 			enemy_array.push(en);
 		}
@@ -267,42 +266,45 @@ $(document).ready(function () {
 		this.color = "blue";
 		this.x_target = 0;
 		this.y_target = 0;
+		//this.state="";
 	}
 
 	Enemy.prototype.update = function (x_target, y_target) {
-		var a,
-		b;
+		if (state == 1) {
+			var a,
+			b;
 
-		if (this.x_target == 0 && this.y_target == 0) {
-			this.x_target = x_target;
-			this.y_target = y_target;
+			if (this.x_target == 0 && this.y_target == 0) {
+				this.x_target = x_target;
+				this.y_target = y_target;
+			}
+			var rd = relative_direction(this.x, this.y, this.x_target, this.y_target);
+
+			var adesso = performance.now();
+			var timeDiff = adesso - this.time + 1;
+			this.time = adesso;
+			if (this.alive == true) {
+
+				do {
+					//da fare una funzione ppiu furba per dare la direzione
+					if (this.x_target == 0 && this.y_target == 0) {
+						this.x_target = x_target;
+						this.y_target = y_target;
+					}
+					var rd = relative_direction(this.x, this.y, this.x_target, this.y_target);
+					this.t = rnd(rd, 40);
+					a = this.x - Math.sin(gradiToRadianti(this.t)) * timeDiff / 1000 * this.speed;
+					b = this.y - Math.cos(gradiToRadianti(this.t)) * timeDiff / 1000 * this.speed;
+
+					rd = this.t;
+				} while (this.checkCollisions(a, b, wall_array))
+				this.y = b;
+				this.x = a;
+			} else {
+				this.alive = false;
+			}
+			return this.alive;
 		}
-		var rd = relative_direction(this.x, this.y, this.x_target, this.y_target);
-
-		var adesso = performance.now();
-		var timeDiff = adesso - this.time + 1;
-		this.time = adesso;
-		if (this.alive == true) {
-
-			do {
-				//da fare una funzione ppiu furba per dare la direzione
-				if (this.x_target == 0 && this.y_target == 0) {
-					this.x_target = x_target;
-					this.y_target = y_target;
-				}
-				var rd = relative_direction(this.x, this.y, this.x_target, this.y_target);
-				this.t = rnd(rd, 40);
-				a = this.x - Math.sin(gradiToRadianti(this.t)) * timeDiff / 1000 * this.speed;
-				b = this.y - Math.cos(gradiToRadianti(this.t)) * timeDiff / 1000 * this.speed;
-
-				rd = this.t;
-			} while (this.checkCollisions(a, b, wall_array))
-			this.y = b;
-			this.x = a;
-		} else {
-			this.alive = false;
-		}
-		return this.alive;
 	}
 
 	Enemy.prototype.draw = function () {
@@ -334,30 +336,30 @@ $(document).ready(function () {
 
 	Enemy.prototype.checkCollisions = function (xnew, ynew, v) {
 		// check that i don't collide with walls or enemies
- 
+
 		for (var i = 0; i < v.length; i++) {
-			var collides=v[i].checkCollision(xnew, ynew, cw / 2)
-			if (collides) { 
-			
-			
-			/*
-			
-			 
-			
-			
-			collides va bene ma dovrei  fare molto altro
-			
-			FARE UNA FUNZIONE CHE MI DICE se l'enemy si trova dietro un muro rispetto a me
-			in questo caso mi muovo con la aggira muro , altrimenti vado diretto verso il bersaglio 30 NOVEMBRE 
-			
-			*/
-			if (Math.abs(collides)<Math.abs(distanza(me.x, me.y, this.x, this.y))){
-			 
-					this.x_target = v[i].x1;
-					this.y_target = v[i].y1;}
-				 
-				return true;
-			}
+			var collides = v[i].checkCollision(xnew, ynew, cw / 2)
+				if (collides) {
+
+					/*
+
+
+
+
+					collides va bene ma dovrei  fare molto altro
+
+					FARE UNA FUNZIONE CHE MI DICE se l'enemy si trova dietro un muro rispetto a me
+					in questo caso mi muovo con la aggira muro , altrimenti vado diretto verso il bersaglio 30 NOVEMBRE
+
+					 */
+					if (Math.abs(collides) < Math.abs(distanza(me.x, me.y, this.x, this.y))) {
+
+						this.x_target = v[i].x1;
+						this.y_target = v[i].y1;
+					}
+
+					return true;
+				}
 
 		}
 		this.x_target = 0;
@@ -475,8 +477,8 @@ $(document).ready(function () {
 	}
 
 	Wall.prototype.checkCollision = function (a, b, r) {
-		var  ptld=pointToLineDistance(a, b, this.x1, this.y1, this.x2, this.y2);
-		if (r >ptld) {
+		var ptld = pointToLineDistance(a, b, this.x1, this.y1, this.x2, this.y2);
+		if (r > ptld) {
 			return ptld;
 		}
 		return false;
@@ -523,6 +525,8 @@ $(document).ready(function () {
 			//bullet_array.push(create_bullet(me.x/cw,me.y/cw,offset.t,current));
 			//bullet_array.push(new Bullet(me.x,me.y,offset.t,current));
 			me.shoot();
+
+			state = 1;
 			//x e y devono essere diversi
 		}
 
